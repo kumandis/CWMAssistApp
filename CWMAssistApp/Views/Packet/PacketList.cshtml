@@ -1,0 +1,298 @@
+﻿@model PacketVM
+@{
+    ViewData["Title"] = "PacketList";
+}
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="~/lib/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables -->
+<link rel="stylesheet" href="~/lib/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="~/lib/dist/css/adminlte.min.css">
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Paketler</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+
+                    <button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#addPacketModal"><i class="fa fa-plus"></i> Yeni Paket</button>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="modal fade" id="modal-delete-packet">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Paket Tanım İptali</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modalPacketId" />
+                    <p>Paket tanımınız pasif edilecektir. Mevcut paket sahipleri kullanımına devam edecek, paketin yeni satışı olmayacaktır. Devam etmek istiyor musunuz ?</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Vazgeç</button>
+                    <button type="button" class="btn btn-primary" id="btnDeletePacket">Devam Et</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>Paket Adı</th>
+                                <th>Fiyatı</th>
+                                <th>Kullanım Hakkı</th>
+                                <th style="width: 20px"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in @Model.PacketList!)
+                            {
+                                <tr id="@item.Id">
+                                    <td>@item.Name</td>
+                                    <td>@item.PacketPrice ₺</td>
+                                    <td>@item.PacketSize</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" id="deletePacket" onclick="DeletePacket('@item.Id')">
+                                            <i class="fas fa-trash" style="color: white"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addPacketModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Paket Ekleme/Güncelleme</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                @*                <form id="addPacketForm" action="AddPacket" method="post">
+                <div class="modal-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                <div class="form-group col-md-10">
+                <label class="form-control-label">Paket Adı : </label>
+                <input asp-for="Name" type="text" class="form-control" name="Name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                </div>
+                <div class="row">
+                <div class="form-group col-md-6">
+                <label class="form-control-label">Kullanım Hakkı : </label>
+                <input asp-for="PacketSize" type="number" class="form-control" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="form-group col-md-6">
+                <label class="form-control-label">Paket Ücreti : </label>
+                <input asp-for="Price" type="number" class="form-control" />
+                </div>
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+                </form>*@
+
+                <form id="addPacketForm" action="AddPacket" method="post">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="inputPacketName">Paket Adı</label>
+                            <input type="text" name="name" class="form-control" id="inputPacketName" placeholder="Paket Adı">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPacketSize">Paket Büyüklüğü</label>
+                            <input type="number" name="packetsize" class="form-control" id="inputPacketSize" min="1" placeholder="Paket Büyüklüğü">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPacketPrice">Paket Fiyatı</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₺</span>
+                                </div>
+                                <input type="number" name="packetprice" class="form-control" id="inputPacketPrice" min="1" placeholder="Paket Fiyatı">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">.00</span>
+                                </div>
+                            </div>
+                            @*<input type="number" name="packetprice" class="form-control" id="inputPacketPrice" min="1" placeholder="Paket Fiyatı">*@
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="container-fluid">
+            <div class="col-sm-6"> </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Pasif Paketler</a></li>
+                </ol>
+            </div><!-- /.col -->
+        </div>
+    </div><!-- /.row -->
+
+
+</section>
+
+@section Scripts
+{
+    <!-- DataTables  & Plugins -->
+    <script src="~/lib/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/jszip/jszip.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/lib/plugins/toastr/toastr.min.js"></script>
+
+    <!-- InputMask -->
+    <script src="~/lib/plugins/moment/moment.min.js"></script>
+    <script src="~/lib/plugins/inputmask/jquery.inputmask.min.js"></script>
+
+
+    <script>
+    
+        function DeletePacket(packetId){
+            $('#modalPacketId').val(packetId);
+            $('#modal-delete-packet').modal();
+        }
+
+        $(function () {
+
+            $('#btnDeletePacket').click(function () {
+
+                var data = { packetId: $('#modalPacketId').val() }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Packet/CancelPacket',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            $('#modal-delete-packet').modal('hide');
+                            alertify.success('Paket İptal Edildi.');
+                            window.location.href = "/Packet/PacketList"
+                        } else {
+                            $('#modal-delete-packet').modal('hide');
+                            alertify.warning('Paket İptal Edilemedi.');
+                        }
+                    },
+                    error: function () {
+                        $('#modal-delete-packet').modal('hide');
+                        alertify.error('Erişim sağlanamadı.');
+                    }
+                });
+            });
+
+
+            $('#datetimepicker3').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('[data-mask]').inputmask()
+
+            $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                },
+                "buttons": ["copy", "csv", "excel", "pdf", "print"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            $('#addPacketForm').validate({
+                rules: {
+                    name: {
+                        required: true,
+                    },
+                    packetsize: {
+                        required: true
+                    },
+                    packetprice: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Lütfen pakete bir ad verin"
+                    },
+                    packetsize: {
+                        required: "Lütfen paketin büyüklüğünü girin"
+                    },
+                    packetprice: {
+                        required: "Lütfen paketin ücretini girin"
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+
+    
+    </script>
+    @if (TempData["notification"] != null)
+    {
+        <script>
+            @Html.Raw(TempData["notification"])
+        </script>
+    }
+}
+

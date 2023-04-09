@@ -1,0 +1,55 @@
+﻿@model DummyDataModel
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <h1>Create Dummy Data</h1>
+    </div>
+    
+</div>
+
+<section class="content">
+    <form asp-controller="Home" asp-action="Privacy">
+        <div class="card-body">
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="PersonalCount">Personel Sayısı</label>
+                    <input name="personalCount" value="@Model.PersonalCount" type="number" class="form-control"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="CustomerCount">Müşteri Sayısı</label>
+                    <input name="customerCount" value="@Model.CustomerCount" type="number" class="form-control"/>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="Capacity">Atölye Kapasitesi</label>
+                    <input name="capacity" value="@Model.Capacity" type="number" class="form-control"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="MinCapacity">Minimum Atölye Katılımcısı</label>
+                    <input name="minCapacity" value="@Model.MinCapacity" type="number" class="form-control" />
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="StartDate">Atölye Kapasitesi</label>
+                    <input name="startDate" value="@Model.StartDate" type="datetime" class="form-control" />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="EndDate">Minimum Atölye Katılımcısı</label>
+                    <input name="endDate" value="@Model.EndDate" type="datetime" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-warning">Dummy Data Üret</button>
+        </div>
+    </form>
+</section>
+
+

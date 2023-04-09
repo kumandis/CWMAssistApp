@@ -1,0 +1,501 @@
+﻿@model AppointmentDetailVM
+@{
+    ViewData["Title"] = "Detail";
+}
+
+<!-- DataTables -->
+<link rel="stylesheet" href="~/lib/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">@Model.Title</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+
+                    @*<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#addPacketModal"><i class="fa fa-plus"></i> Randevu Detay</button>*@
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-default color-palette-box">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tag"></i>
+                    Mali Tablo
+                </h3>
+            </div>
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-info">
+                            <span class="info-box-icon"><i class="far fa-bookmark"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Katılım</span>
+                                <span class="info-box-number">@Model.RegisteredCustomer.Count / @Model.Capacity</span>
+
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: @Model.RateProgressBar%"></div>
+                                </div>
+                                <span class="progress-description">
+                                    Doluluk oranı %@Model.Rate.ToString("##.00")
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Tanımlanan Gelir</span>
+                                <span class="info-box-number">@Model.DefinedIncome ₺</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning"><i class="far fa-flag"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Tanımlanan Gider</span>
+                                <span class="info-box-number">@Model.DefinedExpense ₺</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Net Kâr</span>
+                                <span class="info-box-number">@Model.SummaryIncome ₺</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="modal fade" id="modal-delete">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Müşteri Randevu İptali</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="customerAppointmentId" />
+                    <div class="form-group col-md-12">
+                        <button type="button" onclick="DeleteCustomerForAppointmentModal(1)" class="btn btn-danger btn-block btn-flat">
+                            <i class="fa fa-trash"></i> Müşteri İptali
+                        </button>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <button type="button" onclick="DeleteCustomerForAppointmentModal(2)" class="btn btn-info btn-block btn-flat">
+                            <i class="fa fa-trash"></i> İşletme İptali
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Vazgeç</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="modal-delete-appointment">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Etkinlik İptali</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Etkinlik ile ilgili tüm kayıtlar silinecektir. Devam etmek istiyor musunuz ?</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Vazgeç</button>
+                    <button type="button" class="btn btn-primary" id="btnDeleteAppointment">Devam Et</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i>
+                            Kayıtlı Müşteriler
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Çocuk Adı</th>
+                                    <th>Telefon</th>
+                                    <th style="width: 20px">Ödeme</th>
+                                    <th style="width: 20px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in @Model.RegisteredCustomer)
+                                {
+                                    <tr>
+                                        <td>@item.IndexNumber</td>
+                                        <td>@item.Name</td>
+                                        <td>@item.ChildName</td>
+                                        <td>@item.PhoneNumber</td>
+                                        @if (item.IsPacket)
+                                        {
+                                            <td><span class="badge bg-warning">Paket</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span class="badge bg-info">Nakit</span></td>
+                                        }
+                                        <td>
+                                            <button class="btn btn-danger btn-sm" id="deleteCustomerForAppointment" onclick="DeleteCustomerForAppointment('@item.Id')">
+                                                <i class="fas fa-trash" style="color: white"></i>
+                                            </button>
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-info" data-toggle="modal" data-target="#modal-customer">Yeni Kayıt</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-book"></i>
+                            Etkinlik Bilgileri
+                        </h3>
+                    </div>
+
+                    <form asp-controller="Appointment" asp-action="UpdateAppointment" method="post">
+                        <input type="hidden" name="Id" value="@Model.Id" />
+                        <div class="card-body">
+
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputStartDate">Başlangıç</label>
+                                    <div class="input-group" id="datetimepicker1" data-target-input="nearest">
+                                        <input name="startDate" value="@Model.StartDate" id="inputStartDate" type="text" class="form-control" data-target="#datetimepicker3" />
+                                        <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputEndDate">Bitiş</label>
+                                    <div class="input-group" id="datetimepicker2" data-target-input="nearest">
+                                        <input name="endDate" value="@Model.EndDate" id="inputEndDate" type="text" class="form-control" data-target="#datetimepicker3" />
+                                        <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputSubject">Tema</label>
+                                    <input name="subject" value="@Model.Subject" type="text" class="form-control" id="inputSubject" />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="">Öğretmen</label>
+                                    <select name="personalId" id="personalId" class="form-control" asp-items="@Model.TeachersSelectList">
+                                        <option value=@Model.PersonalId>@Model.PersonalName</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputLessonPrice">Katılım Ücreti</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₺</span>
+                                        </div>
+                                        <input type="number" value="@Model.LessonPrice" name="lessonPrice" class="form-control" id="inputLessonPrice" min="1" placeholder="000">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputTeacherPrice">Öğretmen Ücreti</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₺</span>
+                                        </div>
+                                        <input type="number" value="@Model.TeacherPrice" name="teacherPrice" class="form-control" id="inputTeacherPrice" min="1" placeholder="000">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label for="inputMinAge">Yaş Aralığı</label>
+                                    <input name="minAge" value="@Model.MinAge" id="inputMinAge" type="number" class="form-control" min="1" placeholder="1" />
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="inputMaxAge">-</label>
+                                    <input name="maxAge" value="@Model.MaxAge" id="inputMaxAge" type="number" class="form-control" min="1" placeholder="2" />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputCapacity">Kontenjan</label>
+                                    <input name="capacity" value="@Model.Capacity" id="inputCapacity" type="number" class="form-control" min="1" />
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-delete-appointment">İptal Et</button>
+                            <button type="submit" class="btn btn-warning">Güncelle</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-customer">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Müşteriler</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Adı-Soyad</th>
+                                    <th>Çocuk Adı</th>
+                                    <th>Telefon</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <input hidden id="appointmentId" value="@Model.Id" />
+                                @foreach (var item in @Model.CustomerList)
+                                {
+                                    <tr>
+
+                                        <td><input type="checkbox" class="select-checkbox" value="@item.Id" /></td>
+                                        <td>@item.Name @item.Surname</td>
+                                        <td>@item.ChildName</td>
+                                        <td>@item.PhoneNumber</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                        <button type="button" id="btnSaveCustomerAppointment" class="btn btn-primary">Kayıt Oluştur</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+    </div>
+</section>
+
+@section Scripts{
+
+    <!-- DataTables  & Plugins -->
+    <script src="~/lib/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/plugins/datatables-select/js/dataTables.select.min.js"></script>
+    <script src="~/lib/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/jszip/jszip.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/lib/plugins/toastr/toastr.min.js"></script>
+
+    <!-- InputMask -->
+    <script src="~/lib/plugins/moment/moment.min.js"></script>
+    <script src="~/lib/plugins/inputmask/jquery.inputmask.min.js"></script>
+
+
+    <script>
+        function DeleteCustomerForAppointment(customerAppointmentId) {
+            $('#customerAppointmentId').val(customerAppointmentId);
+            $('#modal-delete').modal();
+        }
+
+        function DeleteCustomerForAppointmentModal(cancelReason) {
+            //1-müşteri iptali, 2-işletmen iptali
+            var appointmentId = $('#appointmentId').val();
+            var data = { CustomerAppointmentId: $('#customerAppointmentId').val(), CancelReason: cancelReason }
+            $.ajax({
+                type: 'POST',
+                url: '/appointment/CancelCustomerAppointment',
+                data: data,
+                success: function (response) {
+                    if (response === "200") {
+                        $('#modal-delete').modal('hide');
+                        alertify.success('Müşteri Randevusu İptal Edildi.');
+                        window.location.href = "/appointment/Detail/" + appointmentId
+                    } else {
+                        $('#modal-delete').modal('hide');
+                        alertify.warning('Müşteri Randevusu İptal Edilemedi.');
+                    }
+                },
+                error: function () {
+                    $('#modal-delete').modal('hide');
+                    alertify.error('Erişim sağlanamadı.');
+                }
+            });
+        }
+
+        $(function () {
+
+            $('#btnDeleteAppointment').click(function () {
+
+                var data = { appointmentId: $('#appointmentId').val() }
+                $.ajax({
+                    type: 'POST',
+                    url: '/appointment/DeleteAppointment',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            $('#modal-delete-appointment').modal('hide');
+                            alertify.success('Etkinlik İptal Edildi.');
+                            window.location.href = "/appointment/Appointment"
+                        } else {
+                            $('#modal-delete-appointment').modal('hide');
+                            alertify.warning('Etkinlik İptal Edilemedi.');
+                        }
+                    },
+                    error: function () {
+                        $('#modal-delete-appointment').modal('hide');
+                        alertify.error('Erişim sağlanamadı.');
+                    }
+                });
+            });
+
+            $('#btnSaveCustomerAppointment').click(function () {
+                var oTable = $('#example1').dataTable();
+                var rowcollection = oTable.$(".select-checkbox:checked", { "page": "all" });
+                var customerIds = [];
+                rowcollection.each(function (index, elem) {
+                    customerIds.push($(elem).val())
+                    //Do something with 'checkbox_value'
+                });
+                var appointmentId = $('#appointmentId').val();
+                var data = { CustomerIdList: customerIds, AppointmentId: appointmentId }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/appointment/SaveCustomerForAppointment',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            $('#modal-customer').modal('hide');
+                            alertify.success('Müşteri Randevusu Oluşturuldu.');
+                            window.location.href = "/appointment/Detail/" + appointmentId
+                        } else {
+                            $('#modal-customer').modal('hide');
+                            alertify.warning('Müşteri Randevusu Oluşturulamadı.');
+                        }
+                    },
+                    error: function () {
+                        $('#modal-customer').modal('hide');
+                        alertify.error('Erişim sağlanamadı.');
+                    }
+                });
+
+
+            });
+
+            $('#datetimepicker1, #datetimepicker2').datetimepicker({
+                format: 'DD/MM/YYYY HH:mm'
+            });
+
+            $('[data-mask]').inputmask()
+
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                }
+                //"buttons": ["copy", "csv", "excel", "pdf", "print"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+        });
+
+    </script>
+
+    @if (TempData["notification"] != null)
+    {
+        <script>
+            @Html.Raw(TempData["notification"])
+        </script>
+    }
+}

@@ -1,0 +1,478 @@
+﻿@model AppointmentVM
+@{
+    ViewData["Title"] = "Appointment";
+}
+<!-- fullCalendar -->
+<link href="/lib/plugins/fullcalendar/core/main.css" rel="stylesheet" />
+<link href="/lib/plugins/fullcalendar/daygrid/main.css" rel="stylesheet" />
+<link href="/lib/plugins/fullcalendar/timegrid/main.css" rel="stylesheet" />
+<link href="/lib/plugins/fullcalendar/list/main.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Randevular</h1>
+            </div><!-- /.col -->
+
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-body p-0">
+                        <!-- THE CALENDAR -->
+                        <div id="calendar"></div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addAppointmentModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Atölye Ekleme/Güncelleme</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addAppointmentForm" action="AddOrUpdateAppointment" method="post">
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="inputStartDate">Başlangıç</label>
+                                <div class="input-group" id="datetimepicker1" data-target-input="nearest">
+                                    <input name="startDate" id="inputStartDate" type="text" class="form-control" data-target="#datetimepicker3" />
+                                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputEndDate">Bitiş</label>
+                                <div class="input-group" id="datetimepicker2" data-target-input="nearest">
+                                    <input name="endDate" id="inputEndDate" type="text" class="form-control" data-target="#datetimepicker3" />
+                                    <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="inputSubject">Tema</label>
+                                <input name="subject" type="text" class="form-control" id="inputSubject" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="">Öğretmen</label>
+                                <select name="personalId" id="personalId" class="form-control" asp-items="@Model.TeachersSelectList">
+                                    <option value="0">Lütfen öğretmen seçiniz.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="inputLessonPrice">Katılım Ücreti</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₺</span>
+                                    </div>
+                                    <input type="number" name="lessonPrice" class="form-control" id="inputLessonPrice" min="1" placeholder="000">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputTeacherPrice">Öğretmen Ücreti</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₺</span>
+                                    </div>
+                                    <input type="number" name="teacherPrice" class="form-control" id="inputTeacherPrice" min="1" placeholder="000">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label for="inputMinAge">Yaş Aralığı</label>
+                                <input name="minAge" id="inputMinAge" type="number" class="form-control" min="1" placeholder="1" />
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputMaxAge">-</label>
+                                <input name="maxAge" id="inputMaxAge" type="number" class="form-control" min="1" placeholder="2" />
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputCapacity">Kontenjan</label>
+                                <input name="capacity" id="inputCapacity" type="number" class="form-control" min="1" />
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="checkWeek">Pazara Kadar</label>
+                                @Html.CheckBoxFor(m=>m.CheckWeek)
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="selectAppointmentDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Randevu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="card-body row">
+                    <div class="col-md-12">
+                        <form id="editAppointment" action="EditAppointment" method="post">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-info btn-block btn-flat"><i class="fa fa-bell"></i> Randevu İşlemleri</button>
+                            </div>
+                        </form>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="col-md-12">
+                        <form id="editAppointment" action="EditAppointment" method="post">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-danger btn-block btn-flat"><i class="fa fa-bell"></i> Randevu İptal</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.28/moment-timezone-with-data-10-year-range.js"></script>
+    <!-- fullCalendar 2.2.5 -->
+    <script src="/lib/plugins/fullcalendar/core/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/moment/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/moment-timezone/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/daygrid/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/timegrid/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/list/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/interaction/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/bootstrap/main.js"></script>
+    <script src="/lib/plugins/fullcalendar/core/locales/tr.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.21.3/locale/bootstrap-table-tr-TR.min.js" integrity="sha512-Dazi+5fT2iql79fem+ZnApBVLmiZW57ykawg5sWREmVz8rJwXILAcpe6ApIjDh+eZ3JcR1whVaq2NOVc/jUuJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    @*<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>*@
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+
+
+
+
+    <script>
+
+        $(function () {
+
+            $('#datetimepicker1, #datetimepicker2').datetimepicker({
+                format: 'DD/MM/YYYY HH:mm'
+            });
+
+            //$('[data-mask]').inputmask()
+
+
+        });
+
+        // add the rule here
+        $.validator.addMethod("valueNotEquals", function (value, element, arg) {
+            return arg !== value;
+        }, "Value must not equal arg.");
+
+        $('#addAppointmentForm').validate({
+            rules: {
+                startDate: {
+                    required: true
+                },
+                endDate: {
+                    required: true
+                },
+                subject: {
+                    required: true
+                },
+                personalId: {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                lessonPrice: {
+                    required: true
+                },
+                teacherPrice: {
+                    required: true
+                },
+                capacity: {
+                    required: true
+                },
+                minAge: {
+                    required: true
+                },
+                maxAge: {
+                    required: true
+                },
+            },
+            messages: {
+                startDate: {
+                    required: "Lütfen başlangıç zamanını girin"
+                },
+                endDate: {
+                    required: "Lütfen bitiş zamanını girin"
+                },
+                subject: {
+                    required: "Lütfen temayı girin"
+                },
+                personalId: {
+                    required: "Lütfen bir öğretmen seçin",
+                    valueNotEquals: "Lütfen bir öğretmen seçin"
+                },
+                lessonPrice: {
+                    required: "Lütfen katılım ücretini girin"
+                },
+                teacherPrice: {
+                    required: "Lütfen öğretmen ücretini girin"
+                },
+                capacity: {
+                    required: "Lütfen kontenjanı girin"
+                },
+                minAge: {
+                    required: "Lütfen yaş aralığını girin"
+                },
+                maxAge: {
+                    required: "Lütfen yaş aralığını girin"
+                }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var selectedEvent = null;
+            var events = [];
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['interaction', 'dayGrid', 'timeGrid', 'list', 'momentTimezone'],
+                timeZone: 'Europe/Istanbul',
+                locale: 'tr',
+                header: { //, today'
+                    left: 'prev, next',
+                    center: 'title',
+                    right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek' //timeGridForFourDay,
+                },
+                footer: {
+                    left: 'prevYear',
+                    right: 'nextYear'
+                },
+                minTime: '08:00:00',
+                maxTime: '21:00:00',
+                snapDuration: '00:15:00',
+                slotLabelFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                },
+                fixedWeekCount: true,
+                showNonCurrentDates: false,
+                contentHeight: 650,
+                defaultView: 'timeGridWeek',
+                weekends: true,
+                //hiddenDays: [0],
+                allDaySlot: false,
+                titleFormat: {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                },
+                titleRangeSeparator: ' - ',
+                columnHeaderFormat: {
+                    weekday: 'long'
+                },
+                views: {
+                    timeGridForFourDay: {
+                        type: 'timeGrid',
+                        duration: { days: 4 },
+                        buttonText: '4 Gün'
+                    }
+                },
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                },
+                events: [],
+                selectable: true,
+                editable: true,
+                select: function (selectionInfo) {
+
+                    selectedEvent = {
+                        id: 0,
+                        start: moment(selectionInfo.start),
+                        end: moment(selectionInfo.end),
+                        subject: "",
+                        capacity: "",
+                        minAge: 0,
+                        maxAge: 0,
+                        personalId: 0,
+                        lessonPrice: "",
+                        teacherPrice: "",
+                        checkWeek:false
+                    }
+
+                    openAddOrUpdateAppointmentModal();
+                },
+                eventClick: function (info) {
+
+                    selectedEvent = {
+                        id: info.event.id,
+                        start: moment(info.event.start),
+                        end: moment(info.event.end),
+                        subject: info.event.extendedProps.subject,
+                        capacity: info.event.extendedProps.capacity,
+                        minAge: info.event.extendedProps.minAge,
+                        maxAge: info.event.extendedProps.maxAge,
+                        lessonPrice: info.event.extendedProps.lessonPrice,
+                        teacherPrice: info.event.extendedProps.teacherPrice,
+                        personalId: info.event.extendedProps.personalId,
+                        checkWeek: info.event.extendedProps.checkWeek,
+                    };
+
+                    window.location.href = "/Appointment/Detail/" + info.event.id;
+
+                    //$('#appointmentId').val(info.event.extendedProps.userId);
+                    //$('#inputStartDate').val(moment(info.event.start).format('DD/MM/YYYY HH:mm'));
+                    //$('#inputEndDate').val(moment(info.event.end).format('DD/MM/YYYY HH:mm'))
+                    //$('#inputSubject').val(info.event.extendedProps.subject);
+                    //$('#inputCapacity').val(info.event.extendedProps.capacity);
+                    //$('#inputMinAge').val(info.event.extendedProps.minAge);
+                    //$('#inputMaxAge').val(info.event.extendedProps.maxAge);
+                    //$('#inputLessonPrice').val(info.event.extendedProps.lessonPrice);
+                    //$('#inputTeacherPrice').val(info.event.extendedProps.teacherPrice);
+                    //$('#personalId').val(info.event.extendedProps.personalId);
+
+                    //$('#selectAppointmentDetailModal').modal();
+                }
+            });
+            calendar.render();
+            getAppointments();
+
+            function getAppointments() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/appointment/GetAppointments',
+                    success: function (response) {
+                        events = [];
+                        var sources = calendar.getEventSources();
+                        for (var i = 0; i < sources.length; i++) {
+                            sources[i].remove();
+                        }
+                        for (var i = 0; i < response.length; i++) {
+                            events.push({
+                                id: response[i].id,
+                                title: response[i].personalName,
+                                subject: response[i].subject,
+                                capacity: response[i].capacity,
+                                start: response[i].startDate,
+                                end: response[i].endDate,
+                                minAge: response[i].minAge,
+                                maxAge: response[i].maxAge,
+                                personalId: response[i].personalId,
+                                lessonPrice: response[i].lessonPrice,
+                                teacherPrice: response[i].teacherPrice,
+                                checkWeek: response[i].checkWeek,
+                            });
+                        }
+                        calendar.addEventSource(events);
+                    },
+                    error: function () {
+                        //$('#saveModal').modal('hide');
+                        //alertify.error('Randevunuz eklenirken bir problem oluştu.');
+                    }
+                });
+            }
+            function openAddOrUpdateAppointmentModal() {
+                if (selectedEvent != null) {
+                    $('#appointmentId').val(selectedEvent.id);
+                    $('#inputStartDate').val(selectedEvent.start.format('DD/MM/YYYY HH:mm'));
+                    $('#inputEndDate').val(selectedEvent.end.format('DD/MM/YYYY HH:mm'));
+                    $('#inputSubject').val(selectedEvent.subject);
+                    $('#inputCapacity').val(selectedEvent.capacity);
+                    $('#inputMinAge').val(selectedEvent.minAge);
+                    $('#inputMaxAge').val(selectedEvent.maxAge);
+                    $('#inputLessonPrice').val(selectedEvent.lessonPrice);
+                    $('#inputTeacherPrice').val(selectedEvent.teacherPrice);
+                    $('#personalId').val(selectedEvent.personalId);
+                    $('#checkWeek').val(selectedEvent.checkWeek);
+                }
+
+                $('#addAppointmentModal').modal();
+            }
+
+            function saveAppointment(data) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/appointment/AddOrUpdateAppointment',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            getAppointments();
+                            $('#saveModal').modal('hide');
+                            data.Id === "0" ? alertify.success('Randevunuz başarıyla eklendi.') : alertify.success('Randevunuz başarıyla güncellenmiştir.');
+                        } else {
+                            $('#saveModal').modal('hide');
+                            alertify.warning('Randevu eklenemedi.');
+                        }
+                    },
+                    error: function () {
+                        $('#saveModal').modal('hide');
+                        alertify.error('Erişim sağlanamadı.');
+                    }
+                });
+            }
+        });
+
+
+    </script>
+
+    @if (TempData["notification"] != null)
+    {
+        <script>
+            @Html.Raw(TempData["notification"])
+        </script>
+    }
+}

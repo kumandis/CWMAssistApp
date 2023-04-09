@@ -1,0 +1,290 @@
+﻿@model CustomerVM
+@{
+    ViewData["Title"] = "CustomerList";
+}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="~/lib/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables -->
+<link rel="stylesheet" href="~/lib/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="~/lib/dist/css/adminlte.min.css">
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Müşteriler</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#addCustomerModal"><i class="fa fa-plus"></i> Yeni Müşteri</button>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-default color-palette-box">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tag"></i>
+                    Müşteri EN'leri
+                </h3>
+            </div>
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">6 Ayın EN Ziyaretçisi</span>
+                                <span class="info-box-number">@Model.CustomerListHeaderInfo.SixMonthVisiter</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">3 Ayın EN Ziyaretçisi</span>
+                                <span class="info-box-number">@Model.CustomerListHeaderInfo.ThreeMonthVisiter</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Ayın EN Ziyaretçisi</span>
+                                <span class="info-box-number">@Model.CustomerListHeaderInfo.LastOneMonthVisiter</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Haftanın EN Ziyaretçisi</span>
+                                <span class="info-box-number">@Model.CustomerListHeaderInfo.WeekVisiter</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>Adı-Soyad</th>
+                                <th>Çocuk Adı</th>
+                                <th>Telefon</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in @Model.CustomerList)
+                                {
+                                    <tr onclick="GetCustomerDetail('@item.Id');">
+                                        <td>@item.Name @item.Surname</td>
+                                        <td>@item.ChildName</td>
+                                        <td>@item.PhoneNumber</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Müşteri Ekleme/Güncelleme</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addCustomerForm" action="AddCustomer" method="post">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="inputCustomerName">Adı</label>
+                                <input name="name" type="text" class="form-control" id="inputCustomerName" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputCustomerSurname">Soyadı</label>
+                                <input name="surname" type="text" class="form-control" id="inputCustomerSurname" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="inputChildName">Çocuk Adı</label>
+                                <input name="childname" type="text" class="form-control" id="inputChildName" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputPhoneNumber">Telefon No</label>
+                                <input name="phonenumber" id="inputPhoneNumber" type="text" class="form-control"
+                                       data-inputmask='"mask": "(999) 999-9999"' data-mask>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="inputChildBirthDay">Çocuk Doğum Tarihi</label>
+                                <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
+                                    <input name="childbirthday" id="inputChildBirthDay" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" data-date-format="YYYY/MM/DD" />
+                                    <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts
+{
+    <!-- DataTables  & Plugins -->
+    <script src="~/lib/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/jszip/jszip.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/lib/plugins/toastr/toastr.min.js"></script>
+
+    <!-- InputMask -->
+    <script src="~/lib/plugins/moment/moment.min.js"></script>
+    <script src="~/lib/plugins/inputmask/jquery.inputmask.min.js"></script>
+
+
+    <script>
+    
+        function GetCustomerDetail(id){
+            window.location.href = "/Customer2/Detail/"+id
+        }
+
+        $(function () {
+
+            $('#datetimepicker3').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('[data-mask]').inputmask()
+
+            $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                },
+                "buttons": ["copy", "csv", "excel", "pdf", "print"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+
+        $('#addCustomerForm').validate({
+            rules: {
+                name: {
+                    required: true,
+                },
+                surname: {
+                    required: true
+                },
+                phonenumber: {
+                    required: true
+                },
+                childname: {
+                    required: true
+                },
+                childbirthday: {
+                    required: true
+                },
+            },
+            messages: {
+                name: {
+                    required: "Lütfen müşteri adını girin"
+                },
+                surname: {
+                    required: "Lütfen müşteri soyadını girin"
+                },
+                phonenumber: {
+                    required: "Lütfen müşteri telefonunu girin"
+                },
+                childname: {
+                    required: "Lütfen çocuk adını girin"
+                },
+                childbirthday: {
+                    required: "Lütfen çocuk doğum tarihini girin"
+                }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+
+    
+    </script>
+    @if (TempData["notification"] != null)
+    {
+        <script>
+            @Html.Raw(TempData["notification"])
+        </script>
+    }
+}

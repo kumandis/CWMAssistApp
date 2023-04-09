@@ -1,0 +1,298 @@
+﻿@model CustomerDetailVM
+
+@{
+    ViewData["Title"] = "Detail";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            @*<div class="col-sm-6">
+            <h1 class="m-0">Müşteriler</h1>
+            </div><!-- /.col -->*@
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-left">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="history.go(-1)"><i class="fa fa-arrow-alt-circle-left"></i> Geri</button>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-default color-palette-box">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tag"></i>
+                    @Model.Customer.Name @Model.Customer.Surname
+                </h3>
+            </div>
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Tüm Randevuları</span>
+                                <span class="info-box-number">@Model.TotalAppointmentCount</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Tamamlanan Getiri</span>
+                                <span class="info-box-number">@Model.ComplatedIncome ₺</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning"><i class="far fa-flag"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Planlanan Getiri</span>
+                                <span class="info-box-number">@Model.PlannedIncome ₺</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Randevu İptalleri</span>
+                                <span class="info-box-number">@Model.CancelAppointmentCount</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="modal fade" id="modal-packet">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Paketler</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group col-md-12">
+                            <input type="hidden" id="customerId" value="@Model.Customer.Id"/>
+                            <label for="">Paket Seçimi</label>
+                            <select name="packetId" id="packetId" class="form-control" asp-items="@Model.PacketsSelectList">
+                                @*<option value="0">Lütfen paket seçiniz.</option>*@
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                        <button type="button" id="btnSaveCustomerPacket" class="btn btn-primary">Paket Tanımla</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i>
+                            Bilgiler
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="Update" method="post">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <!-- text input -->
+                                    <div class="form-group">
+                                        <label>Adı</label>
+                                        <input type="text" class="form-control" value=@Model.Customer.Name>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Soyadı</label>
+                                        <input type="text" class="form-control" value=@Model.Customer.Surname>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <!-- text input -->
+                                    <div class="form-group">
+                                        <label>Telefon</label>
+                                        <input type="text" class="form-control" value='@Model.Customer.PhoneNumber'>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Çocuk Doğum Tarihi</label>
+                                        <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
+                                            <input name="childbirthday" value='@Model.Customer.ChildBirthday' id="inputChildBirthDay" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" data-date-format="YYYY/MM/DD" />
+                                            <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <!-- text input -->
+                                    <div class="form-group">
+                                        <label>Çocuk Adı</label>
+                                        <input type="text" class="form-control" value='@Model.Customer.ChildName'>
+                                    </div>
+                                </div>
+                                @*<div class="col-sm-6">
+                                <div class="form-group">
+                                <label>Çocuk Doğum Tarihi</label>
+                                <input type="text" class="form-control" value="18.09.2018" disabled>
+                                </div>
+                                </div>*@
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer">
+                        <button class="btn btn-warning">Güncelle</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-book"></i>
+                            Paket Bilgileri
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        @if (Model.CustomerPacket.Count > 0)
+                        {
+                            foreach (var customerPacket in Model.CustomerPacket)
+                            {
+                                <div class="info-box bg-info">
+                                    <span class="info-box-icon"><i class="far fa-bookmark"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">@customerPacket.PacketName</span>
+                                        <span class="info-box-number">@customerPacket.UsedPieces/@customerPacket.PacketSize</span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: @customerPacket.Rate%"></div>
+                                        </div>
+                                        <span class="progress-description">
+                                            @customerPacket.PacketCreatedElapsedTime gün içinde %@customerPacket.Rate kullanıldı
+                                        </span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <!-- small card -->
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>Paket Yok</h3>
+
+                                    <p>Yeni paket tanımlayabilirsin</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <a href="#modal-packet" data-toggle="modal" class="small-box-footer">
+                                    Paket Tanımla <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                    <!-- /.card-body -->
+                    @*<div class="card-footer">
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-packet">Paket Tanımla</button>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts
+    {
+    <script>
+        $(function () {
+
+            $('#btnSaveCustomerPacket').click(function () {
+
+                var customerId = $('#customerId').val();
+                var packetId = $("#packetId option:selected").val();
+                var data = { CustomerId: customerId, PacketId: packetId }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Customer2/AddCustomerPacket',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            $('#modal-packet').modal('hide');
+                            alertify.success('Paket tanımlaması yapıldı');
+                            window.location.href = "/customer2/Detail/" + customerId
+                        } else {
+                            $('#modal-packet').modal('hide');
+                            alertify.warning('Paket tanımlamada hata oluştu');
+                        }
+                    },
+                    error: function () {
+                        $('#modal-packet').modal('hide');
+                        alertify.error('Erişim sağlanamadı.');
+                    }
+                });
+
+
+            });
+
+            $('#datetimepicker3').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('[data-mask]').inputmask()
+        });
+    </script>
+}
