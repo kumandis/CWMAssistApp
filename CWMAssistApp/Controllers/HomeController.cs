@@ -28,8 +28,8 @@ namespace CWMAssistApp.Controllers
             var vm = new IndexVM();
             var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
 
-            vm.TotalAppointmentCount = _context.Appointments.Count(x => x.CompanyId == user.CompanyId && x.Status);
-            vm.TotalVisitorCount = _context.CustomerAppointments.Count(x => x.CompanyId == user.CompanyId && x.Status);
+            vm.TotalAppointmentCount = _context.Appointments.Count(x => x.CompanyId == user.CompanyId && x.Status && x.StartDate < DateTime.Now);
+            vm.TotalVisitorCount = _context.CustomerAppointments.Count(x => x.CompanyId == user.CompanyId && x.Status && x.AppointmentDate < DateTime.Now);
             vm.TotalUniqueVisitorCount = _context.Customers.Count(x => x.StoreId == user.CompanyId);
 
             return View(vm);
@@ -95,7 +95,7 @@ namespace CWMAssistApp.Controllers
                 }
 
                 customerCountForRate = thisWeekCustomerCount - lastWeekCustomerCount;
-                model.WeekRate = (customerCountForRate * 100) / lastWeekCustomerCount;
+                model.WeekRate = (customerCountForRate * 100) / (lastWeekCustomerCount == 0 ? 1 : lastWeekCustomerCount);
                 model.ArrowUp = customerCountForRate >= 0;
 
             }

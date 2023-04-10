@@ -240,35 +240,37 @@ namespace CWMAssistApp.Controllers
                     return RedirectToAction("Appointment");
                 }
 
-                var registrationCustomerList = _context.Customers.Where(x => x.StoreId == user.CompanyId).ToList();
+                
                 var registratedCustomerList =
                     _context.CustomerAppointments.Where(x => x.AppointmentId == appointment.Id && x.Status);
 
-
+                var registrationCustomerList = _context.Customers.Where(x => x.StoreId == user.CompanyId && 
+                                                                             !registratedCustomerList.Select(p=>p.CustomerId).Contains(x.Id)).ToList();
+                
                 //foreach (var customer in customerList)
                 //{
-                    //var isRegistered = registratedCustomerList.Select(x => x.CustomerId).Contains(customer.Id);
-                    //if (!isRegistered)
-                    //{
-                        //var isActivePacket =
-                        //    _context.CustomerPackets.Where(x => x.CustomerId == customer.Id && x.Status == true).OrderBy(t=> t.CreatedDate).FirstOrDefault();
-                        //var _remainingCount = 0;
+                //var isRegistered = registratedCustomerList.Select(x => x.CustomerId).Contains(customer.Id);
+                //if (!isRegistered)
+                //{
+                //var isActivePacket =
+                //    _context.CustomerPackets.Where(x => x.CustomerId == customer.Id && x.Status == true).OrderBy(t=> t.CreatedDate).FirstOrDefault();
+                //var _remainingCount = 0;
 
-                        //if (isActivePacket != null)
-                        //    _remainingCount = _context.CustomerAppointments.Count(x =>
-                        //        x.CustomerId == customer.Id && x.PacketId == isActivePacket.Id && x.Status);
+                //if (isActivePacket != null)
+                //    _remainingCount = _context.CustomerAppointments.Count(x =>
+                //        x.CustomerId == customer.Id && x.PacketId == isActivePacket.Id && x.Status);
 
-                        //registrationCustomerList.Add(new Customer()
-                        //{
-                        //    Id = customer.Id,
-                        //    Name = customer.Name + " "+ customer.Surname,
-                        //    ChildName = customer.ChildName,
-                        //    IsPacket = true,
-                        //    PacketCount = 0,  //isActivePacket == null ? 0 : isActivePacket.PacketSize,
-                        //    RemainingCount = 0, //_remainingCount,
-                        //    PacketText = "-" //isActivePacket == null ? "-" : _remainingCount+"/"+isActivePacket.PacketSize
-                        //});
-                    //}
+                //registrationCustomerList.Add(new Customer()
+                //{
+                //    Id = customer.Id,
+                //    Name = customer.Name + " "+ customer.Surname,
+                //    ChildName = customer.ChildName,
+                //    IsPacket = true,
+                //    PacketCount = 0,  //isActivePacket == null ? 0 : isActivePacket.PacketSize,
+                //    RemainingCount = 0, //_remainingCount,
+                //    PacketText = "-" //isActivePacket == null ? "-" : _remainingCount+"/"+isActivePacket.PacketSize
+                //});
+                //}
                 //}
 
                 var registratedCustomers = new List<RegistrationCustomer>();
