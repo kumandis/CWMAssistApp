@@ -99,7 +99,7 @@ namespace CWMAssistApp.Controllers
 
                 var personal = _context.Personals.SingleOrDefault(x => x.Id == Guid.Parse(model.PersonalId));
 
-                var weekCounter = 1;
+                var weekCounter = 0;
 
                 if (model.CheckWeek)
                 {

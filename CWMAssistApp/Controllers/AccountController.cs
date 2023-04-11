@@ -42,7 +42,7 @@ namespace CWMAssistApp.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Appointment", "Appointment");
                 }
                 ModelState.AddModelError(String.Empty, "Kullanıcı adı veya şifre hatalı.");
             }
