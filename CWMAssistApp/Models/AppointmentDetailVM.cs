@@ -19,6 +19,8 @@ namespace CWMAssistApp.Models
         public decimal LessonPrice { get; set; }
         public decimal TeacherPrice { get; set; }
         public string? Title { get; set; }
+        public string? TitleDate { get; set; }
+        public string? TitleHour { get; set; }
         public decimal Rate { get; set; }
         public int RateProgressBar { get; set; }
         public decimal DefinedIncome { get; set; }

@@ -13,11 +13,23 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">@Model.Title</h1>
+                <div class="row mb-2">
+                    <h1 class="m-0">@Model.Title</h1>
+                </div>
+
+
+                @*<h1 class="m-0">@Model.Title</h1>*@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-
+                    <div class="time-label">
+                        <span class="bg-gradient-gray">
+                            @Model.TitleDate 
+                            <i class="fas fa-clock">
+                                @Model.TitleHour
+                            </i>
+                        </span>
+                    </div>
                     @*<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#addPacketModal"><i class="fa fa-plus"></i> Randevu Detay</button>*@
                 </ol>
             </div><!-- /.col -->
@@ -32,7 +44,7 @@
                 <h3 class="card-title">
                     Mali Tablo
                 </h3>
-                
+
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-plus"></i>

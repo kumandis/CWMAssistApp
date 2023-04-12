@@ -314,7 +314,9 @@ namespace CWMAssistApp.Controllers
                     
                 }
 
-                model.Title = appointment.Subject + " (" + appointment.StartDate.ToString("dd/MM/yyyy HH:mm") + "-"+ appointment.EndDate.ToString("HH:mm") +")";
+                model.Title = appointment.Subject;
+                model.TitleDate = appointment.StartDate.ToLongDateString();
+                model.TitleHour = appointment.StartDate.ToString("HH:mm");
                 model.Capacity = appointment.Capacity;
                 model.StartDate = appointment.StartDate;
                 model.EndDate = appointment.EndDate;
