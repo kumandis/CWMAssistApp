@@ -7,7 +7,12 @@ namespace CWMAssistApp.Models
 {
     public class CustomerDetailVM
     {
-        public Customer Customer { get; set; }
+        public Guid? CustomerId { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerSurname { get; set; }
+        public string ChildName { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime ChildBirthday { get; set; }
         public decimal ComplatedIncome { get; set; }
         public int TotalAppointmentCount { get; set; }
         public int CancelAppointmentCount { get; set; }

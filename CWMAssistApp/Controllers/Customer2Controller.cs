@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using CWMAssistApp.Models;
 using CWMAssistApp.Services.Toastr;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace CWMAssistApp.Controllers
 {
@@ -140,7 +141,12 @@ namespace CWMAssistApp.Controllers
 
                 model = new CustomerDetailVM()
                 {
-                    Customer = customer,
+                    CustomerId = customer.Id,
+                    CustomerName = customer.Name,
+                    CustomerSurname = customer.Surname,
+                    PhoneNumber = customer.PhoneNumber,
+                    ChildBirthday = customer.ChildBirthday,
+                    ChildName = customer.ChildName,
                     CustomerPacket = customerPacketVM,
                     TotalAppointmentCount = headerModel.TotalAppointmentCount,
                     ComplatedIncome = headerModel.ComplatedIncome,
@@ -165,7 +171,57 @@ namespace CWMAssistApp.Controllers
 
         public IActionResult Update(CustomerDetailVM model)
         {
-            return View("Detail");
+            if (!ModelState.IsValid)
+            {
+                ShowToastr("Girilen değerler hatalı", ToastrType.Warning);
+                return RedirectToAction("Detail", new { id = model.CustomerId.ToString() });
+            }
+
+            try
+            {
+                var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
+
+                if (user == null)
+                {
+                    ShowToastr("Kullanıcı bulunamadı", ToastrType.Warning);
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var entity = _context.Customers.SingleOrDefault(x => x.Id == model.CustomerId);
+
+                if (entity == null)
+                {
+                    ShowToastr("Güncellenecek veri bulunamadı", ToastrType.Warning);
+                    return RedirectToAction("Detail", new { id = model.CustomerId.ToString() });
+                }
+
+                if (entity.Name == model.CustomerName &&
+                    entity.Surname == model.CustomerSurname &&
+                    entity.PhoneNumber == model.PhoneNumber &&
+                    entity.ChildBirthday.ToShortDateString() == model.ChildBirthday.ToShortDateString() &&
+                    entity.ChildName == model.ChildName)
+                {
+                    ShowToastr("Değişiklik saptanamadı.", ToastrType.Warning);
+                    return RedirectToAction("Detail", new { id = model.CustomerId.ToString() });
+                }
+
+                entity.Name = model.CustomerName;
+                entity.Surname = model.CustomerSurname;
+                entity.PhoneNumber = model.PhoneNumber;
+                entity.ChildBirthday = model.ChildBirthday;
+                entity.ChildName = model.ChildName;
+
+                _context.Update(entity);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ShowToastr("Değişiklik yapılırken bir hata meydana geldi", ToastrType.Error);
+                return RedirectToAction("Detail", new { id = model.CustomerId });
+            }
+
+            ShowToastr("Değişiklik yapıldı", ToastrType.Success);
+            return RedirectToAction("Detail", new { id = model.CustomerId });
         }
 
         [HttpPost]

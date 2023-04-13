@@ -4,6 +4,8 @@
     ViewData["Title"] = "Detail";
 }
 
+<link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
+
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -26,7 +28,7 @@
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-tag"></i>
-                    @Model.Customer.Name @Model.Customer.Surname
+                    @Model.CustomerName @Model.CustomerSurname
                 </h3>
             </div>
             <div class="card-body">
@@ -107,7 +109,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group col-md-12">
-                            <input type="hidden" id="customerId" value="@Model.Customer.Id"/>
+                            <input type="hidden" id="customerId" value="@Model.CustomerId"/>
                             <label for="">Paket Seçimi</label>
                             <select name="packetId" id="packetId" class="form-control" asp-items="@Model.PacketsSelectList">
                                 @*<option value="0">Lütfen paket seçiniz.</option>*@
@@ -154,19 +156,20 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="Update" method="post">
+                        <form asp-controller="Customer2" asp-action="Update" method="post">
+                            <input type="hidden" name="customerId" value="@Model.CustomerId" />
                             <div class="row">
                                 <div class="col-sm-6">
                                     <!-- text input -->
                                     <div class="form-group">
                                         <label>Adı</label>
-                                        <input type="text" class="form-control" value=@Model.Customer.Name>
+                                        <input type="text" name="customerName" class="form-control" value=@Model.CustomerName>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Soyadı</label>
-                                        <input type="text" class="form-control" value=@Model.Customer.Surname>
+                                        <input type="text" name="customerSurname" class="form-control" value=@Model.CustomerSurname>
                                     </div>
                                 </div>
                             </div>
@@ -176,7 +179,7 @@
                                     <!-- text input -->
                                     <div class="form-group">
                                         <label>Telefon</label>
-                                        <input type="text" class="form-control" value='@Model.Customer.PhoneNumber'
+                                        <input type="text" class="form-control" name="phoneNumber" value='@Model.PhoneNumber'
                                                data-inputmask='"mask": "0 (999) 999 99 99"' data-mask>
                                     </div>
                                 </div>
@@ -184,7 +187,7 @@
                                     <div class="form-group">
                                         <label>Çocuk Doğum Tarihi</label>
                                         <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
-                                            <input name="childbirthday" value='@Model.Customer.ChildBirthday' id="inputChildBirthDay" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" data-date-format="YYYY/MM/DD" />
+                                            <input name="childbirthday" value='@Model.ChildBirthday' id="inputChildBirthDay" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" data-date-format="YYYY/MM/DD"/>
                                             <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                             </div>
@@ -198,7 +201,7 @@
                                     <!-- text input -->
                                     <div class="form-group">
                                         <label>Çocuk Adı</label>
-                                        <input type="text" class="form-control" value='@Model.Customer.ChildName'>
+                                        <input type="text" name="childName" class="form-control" value='@Model.ChildName'>
                                     </div>
                                 </div>
                                 @*<div class="col-sm-6">
@@ -208,12 +211,13 @@
                                 </div>
                                 </div>*@
                             </div>
+                            <div class="card-footer">
+                                <button class="btn btn-warning">Güncelle</button>
+                            </div>
                         </form>
                     </div>
                     <!-- /.card-body -->
-                    <div class="card-footer">
-                        <button class="btn btn-warning">Güncelle</button>
-                    </div>
+                    
                 </div>
             </div>
             <div class="col-md-4">
@@ -283,6 +287,8 @@
     <script src="~/lib/plugins/moment/moment.min.js"></script>
     <script src="~/lib/plugins/inputmask/jquery.inputmask.min.js"></script>
 
+    <script src="~/lib/plugins/toastr/toastr.min.js"></script>
+
     <script>
         $(function () {
 
@@ -322,4 +328,11 @@
             $('[data-mask]').inputmask()
         });
     </script>
+    
+    @if (TempData["notification"] != null)
+    {
+        <script>
+            @Html.Raw(TempData["notification"])
+        </script>
+    }
 }
