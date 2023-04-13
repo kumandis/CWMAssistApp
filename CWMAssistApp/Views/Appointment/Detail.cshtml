@@ -201,7 +201,7 @@
                                 {
                                     <tr>
                                         <td>@item.IndexNumber</td>
-                                        <td>@item.Name</td>
+                                        <td><a href="javascript:GetCustomerDetail('@item.CustomerId');">@item.Name</a> </td>
                                         <td>@item.ChildName</td>
                                         <td>@item.PhoneNumber</td>
                                         @if (item.IsPacket)
@@ -400,6 +400,11 @@
 
 
     <script>
+    
+        function GetCustomerDetail(id){
+            window.location.href = "/Customer2/Detail/"+id
+        }
+
         function DeleteCustomerForAppointment(customerAppointmentId) {
             $('#customerAppointmentId').val(customerAppointmentId);
             $('#modal-delete').modal();
@@ -508,6 +513,7 @@
 
         });
 
+    
     </script>
 
     @if (TempData["notification"] != null)
