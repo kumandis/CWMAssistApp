@@ -33,6 +33,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/Denied";
     options.Cookie.Name = "CWMAssistApp.Cookie";
     options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(1);
+    options.SlidingExpiration = true;
 });
 
 builder.Services.AddControllersWithViews();
