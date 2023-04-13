@@ -136,7 +136,28 @@
                         </button>
                     </div>
                     <div class="modal-body">
-
+                        <div class="modal-body">
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Konu</th>
+                                    <th>Ödeme Tipi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in @Model.CustomerAppointmentHistory)
+                                {
+                                    <tr>
+                                        
+                                        <td>@item.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@item.AppointmentTitle</td>
+                                        <td>@item.PaymentType</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>

@@ -117,7 +117,7 @@ namespace CWMAssistApp.Controllers
 
                 foreach (var customerPacket in customerPackets)
                 {
-                    var packetUsedCount = _context.CustomerAppointments.Count(x => x.CustomerId == customer.Id && x.PacketId == customerPacket.Id);
+                    var packetUsedCount = _context.CustomerAppointments.Count(x => x.CustomerId == customer.Id && x.PacketId == customerPacket.Id && x.Status);
                     var packetCreatedElapsedTime = 0;
                     if (customerPacket.CreatedDate != null)
                     {
@@ -152,6 +152,7 @@ namespace CWMAssistApp.Controllers
                     ComplatedIncome = headerModel.ComplatedIncome,
                     CancelAppointmentCount = headerModel.CancelAppointmentCount,
                     PlannedIncome = headerModel.PlannedIncome,
+                    CustomerAppointmentHistory = headerModel.CustomerAppointmentHistory
                 };
 
                 model.PacketsSelectList = new List<SelectListItem>();
@@ -274,8 +275,9 @@ namespace CWMAssistApp.Controllers
             decimal plannedTotalPrice = 0;
             var totalAppointmentCount = 0;
             var totalCancelledAppointmentCount = 0;
+            model.CustomerAppointmentHistory = new List<CustomerAppointmentHistory>();
 
-            var customerAppointments = _context.CustomerAppointments.Where(x => x.CustomerId == customerId && x.Status);
+            var customerAppointments = _context.CustomerAppointments.Where(x => x.CustomerId == customerId && x.Status).OrderByDescending(x=>x.AppointmentDate);
             totalCancelledAppointmentCount =
                 _context.CustomerAppointments.Count(x => x.CustomerId == customerId && x.Status == false);
             totalAppointmentCount = customerAppointments.Count();
@@ -283,6 +285,8 @@ namespace CWMAssistApp.Controllers
             foreach (var customerAppointment in customerAppointments)
             {
                 var _appointment = _context.Appointments.SingleOrDefault(x => x.Id == customerAppointment.AppointmentId);
+
+                
 
                 if (_appointment != null)
                 {
@@ -317,6 +321,13 @@ namespace CWMAssistApp.Controllers
                             }
                         }
                     }
+                    model.CustomerAppointmentHistory.Add(new CustomerAppointmentHistory()
+                    {
+                        Id = _appointment.Id,
+                        AppointmentDate = _appointment.StartDate,
+                        AppointmentTitle = _appointment.Subject,
+                        PaymentType = customerAppointment.PaymentType == (int)PaymentType.Packet ? "Paket" : "Nakit"
+                    });
                 }
             }
 
