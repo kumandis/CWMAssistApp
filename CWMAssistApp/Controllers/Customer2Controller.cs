@@ -334,6 +334,7 @@ namespace CWMAssistApp.Controllers
                     {
                         Id = _appointment.Id,
                         AppointmentDate = _appointment.StartDate,
+                        ProductName = _appointment.ProductName,
                         AppointmentTitle = _appointment.Subject,
                         PaymentType = customerAppointment.PaymentType == (int)PaymentType.Packet ? "Paket" : "Nakit"
                     });

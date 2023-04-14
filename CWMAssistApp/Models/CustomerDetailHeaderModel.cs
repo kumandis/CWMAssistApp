@@ -17,5 +17,6 @@ namespace CWMAssistApp.Models
         public DateTime AppointmentDate { get; set; }
         public string AppointmentTitle { get; set; }
         public string PaymentType { get; set; }
+        public string? ProductName { get; set; }
     }
 }

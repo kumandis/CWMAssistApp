@@ -5,6 +5,11 @@
 }
 
 <link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
+<!-- DataTables -->
+<link rel="stylesheet" href="~/lib/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<link rel="stylesheet" href="~/lib/plugins/toastr/toastr.min.css">
 
 <div class="content-header">
     <div class="container-fluid">
@@ -151,6 +156,7 @@
                                 <thead>
                                 <tr>
                                     <th>Tarih</th>
+                                    <th>Hizmet</th>
                                     <th>Konu</th>
                                     <th>Ödeme Tipi</th>
                                 </tr>
@@ -161,6 +167,7 @@
                                     <tr>
                                         
                                         <td>@item.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@item.ProductName</td>
                                         <td>@item.AppointmentTitle</td>
                                         <td>@item.PaymentType</td>
                                     </tr>
@@ -319,6 +326,20 @@
 
 @section Scripts
 {
+    <!-- DataTables  & Plugins -->
+    <script src="~/lib/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/lib/plugins/jszip/jszip.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/lib/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/lib/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/lib/plugins/toastr/toastr.min.js"></script>
     <!-- InputMask -->
     <script src="~/lib/plugins/moment/moment.min.js"></script>
     <script src="~/lib/plugins/inputmask/jquery.inputmask.min.js"></script>
@@ -362,6 +383,11 @@
             });
 
             $('[data-mask]').inputmask()
+
+            $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "buttons": ["excel", "pdf", "print"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
     
