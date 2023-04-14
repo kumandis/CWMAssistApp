@@ -211,6 +211,8 @@ namespace CWMAssistApp.Controllers
                 entity.PhoneNumber = model.PhoneNumber;
                 entity.ChildBirthday = model.ChildBirthday;
                 entity.ChildName = model.ChildName;
+                entity.UpdatedDate = DateTime.Now;
+                entity.UpdatedName = user.NormalizedUserName;
 
                 _context.Update(entity);
                 _context.SaveChanges();
