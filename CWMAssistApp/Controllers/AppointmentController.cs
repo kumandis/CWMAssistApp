@@ -400,18 +400,20 @@ namespace CWMAssistApp.Controllers
                 {
                     return Json("Kullanıcı bulunamadı");
                 }
-
+                var _appointmentGuid = Guid.Parse(model.AppointmentId);
+                var _appointment = _context.Appointments.SingleOrDefault(x => x.Id == _appointmentGuid);
                 CustomerAppointment customerAppointment;
 
                 foreach (var customerId in model.CustomerIdList)
                 {
                     var _customerGuid = Guid.Parse(customerId);
-                    var _appointmentGuid = Guid.Parse(model.AppointmentId);
+                    
 
                     var _packetOwerflow = false;
 
 
-                    var customerActivePacket = _context.CustomerPackets.Where(x => x.CustomerId == _customerGuid && x.Status).OrderBy(t=>t.CreatedDate).FirstOrDefault();
+                    var customerActivePacket = _context.CustomerPackets.Where(x => x.CustomerId == _customerGuid && x.ProductId == _appointment.ProductId && x.Status).
+                        OrderBy(t=>t.CreatedDate).FirstOrDefault();
 
                     if (customerActivePacket != null)
                     {
@@ -436,7 +438,7 @@ namespace CWMAssistApp.Controllers
                         ? PaymentType.Packet
                         : PaymentType.Cash;
 
-                    var _appointment = _context.Appointments.SingleOrDefault(x => x.Id == _appointmentGuid);
+                    
 
                     customerAppointment = new CustomerAppointment()
                     {
