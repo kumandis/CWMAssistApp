@@ -19,7 +19,7 @@ namespace CWMAssistApp.Models
         public decimal PlannedIncome { get; set; }
         public List<CustomerPacketVM>? CustomerPacket { get; set; }
         public List<SelectListItem>? PacketsSelectList { get; internal set; }
-        public List<CustomerAppointmentHistory> CustomerAppointmentHistory { get; set; }
+        public List<CustomerAppointmentHistory>? CustomerAppointmentHistory { get; set; }
     }
 
     public class CustomerPacketVM
