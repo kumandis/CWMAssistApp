@@ -61,42 +61,42 @@ namespace CWMAssistApp.Controllers
         [HttpPost]
         public IActionResult Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                ModelState.AddModelError(String.Empty, "Bilgilerinizi kontrol ediniz.");
-                return View(model);
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    ModelState.AddModelError(String.Empty, "Bilgilerinizi kontrol ediniz.");
+            //    return View(model);
+            //}
 
-            if (model.Password != model.RePassword)
-            {
-                ModelState.AddModelError(String.Empty, "Şifreler eşleşmiyor.");
-                return View(model);
-            }
+            //if (model.Password != model.RePassword)
+            //{
+            //    ModelState.AddModelError(String.Empty, "Şifreler eşleşmiyor.");
+            //    return View(model);
+            //}
 
-            try
-            {
-                AppUser appUser = new AppUser()
-                {
-                    CompanyId = Guid.NewGuid(),
-                    CompanyName = model.CompanyName,
-                    Email = model.Email,
-                    IsAdmin = true,
-                    FullName = model.FullName,
-                    UserName = model.Email
-                };
-                IdentityResult result = _userManager.CreateAsync(appUser,model.Password).Result;
+            //try
+            //{
+            //    AppUser appUser = new AppUser()
+            //    {
+            //        CompanyId = Guid.NewGuid(),
+            //        CompanyName = model.CompanyName,
+            //        Email = model.Email,
+            //        IsAdmin = true,
+            //        FullName = model.FullName,
+            //        UserName = model.Email
+            //    };
+            //    IdentityResult result = _userManager.CreateAsync(appUser,model.Password).Result;
 
-                if (!result.Succeeded)
-                {
-                    ModelState.AddModelError(String.Empty, result.Errors.FirstOrDefault()?.Description);
-                    return View(model);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return View(model);
-            }
+            //    if (!result.Succeeded)
+            //    {
+            //        ModelState.AddModelError(String.Empty, result.Errors.FirstOrDefault()?.Description);
+            //        return View(model);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.ToString());
+            //    return View(model);
+            //}
             return View("Login");
         }
         public IActionResult Logout()
