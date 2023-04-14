@@ -39,7 +39,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Atölye Ekleme/Güncelleme</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Atölye Ekleme</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -67,17 +67,38 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label for="inputSubject">Tema</label>
+                                <label for="">Hizmet Türü</label>
+                                <select name="selectedProductId" id="selectedProductId" class="form-control" asp-items="@Model.ProductsSelectList">
+                                    <option value="0">Lütfen hizmet türü seçiniz.</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputSubject">Konu</label>
                                 <input name="subject" type="text" class="form-control" id="inputSubject" />
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="">Öğretmen</label>
                                 <select name="personalId" id="personalId" class="form-control" asp-items="@Model.TeachersSelectList">
                                     <option value="0">Lütfen öğretmen seçiniz.</option>
                                 </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputTeacherPrice">Öğretmen Ücreti</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₺</span>
+                                    </div>
+                                    <input type="number" name="teacherPrice" class="form-control" id="inputTeacherPrice" min="0" placeholder="000">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">.00</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -93,17 +114,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label for="inputTeacherPrice">Öğretmen Ücreti</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">₺</span>
-                                    </div>
-                                    <input type="number" name="teacherPrice" class="form-control" id="inputTeacherPrice" min="1" placeholder="000">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">.00</span>
-                                    </div>
-                                </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputCapacity">Kontenjan</label>
+                                <input name="capacity" id="inputCapacity" type="number" class="form-control" min="1" />
                             </div>
                         </div>
 
@@ -115,10 +128,6 @@
                             <div class="form-group col-md-3">
                                 <label for="inputMaxAge">-</label>
                                 <input name="maxAge" id="inputMaxAge" type="number" class="form-control" min="1" placeholder="2" />
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="inputCapacity">Kontenjan</label>
-                                <input name="capacity" id="inputCapacity" type="number" class="form-control" min="1" />
                             </div>
                             <div class="form-group col-md-3">
                                 <label for="checkWeek">Pazara Kadar</label>
@@ -200,6 +209,37 @@
 
             //$('[data-mask]').inputmask()
 
+            $("#selectedProductId").change(function(){
+                var selected = $('#selectedProductId option:selected').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Product/GetProductPrice',
+                    data: {"id": selected},
+                    success: function (response) {
+                        $("#inputLessonPrice").val(response);
+                    },
+                    error: function () {
+                        alertify.error('Hizmet bedeli bulunamadı');
+                    }
+                });
+            });
+
+            $("#personalId").change(function () {
+                var selected = $('#personalId option:selected').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Personal/GetPersonalPrice',
+                    data: { "id": selected },
+                    success: function (response) {
+                        $("#inputTeacherPrice").val(response);
+                    },
+                    error: function () {
+                        alertify.error('Personel seans bedeli bulunamadı');
+                    }
+                });
+            });
 
         });
 
@@ -220,6 +260,10 @@
                     required: true
                 },
                 personalId: {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                selectedProductId: {
                     required: true,
                     valueNotEquals: "0"
                 },
@@ -252,6 +296,10 @@
                 personalId: {
                     required: "Lütfen bir öğretmen seçin",
                     valueNotEquals: "Lütfen bir öğretmen seçin"
+                },
+                selectedProductId: {
+                    required: "Lütfen bir hizmet seçin",
+                    valueNotEquals: "Lütfen bir hizmet seçin"
                 },
                 lessonPrice: {
                     required: "Lütfen katılım ücretini girin"
@@ -350,7 +398,8 @@
                         personalId: 0,
                         lessonPrice: "",
                         teacherPrice: "",
-                        checkWeek:false
+                        checkWeek:false,
+                        selectedProductId: 0
                     }
 
                     openAddOrUpdateAppointmentModal();
@@ -369,6 +418,7 @@
                         teacherPrice: info.event.extendedProps.teacherPrice,
                         personalId: info.event.extendedProps.personalId,
                         checkWeek: info.event.extendedProps.checkWeek,
+                        selectedProductId: info.event.extendedProps.selectedProductId,
                     };
 
                     window.location.href = "/Appointment/Detail/" + info.event.id;
@@ -414,6 +464,7 @@
                                 lessonPrice: response[i].lessonPrice,
                                 teacherPrice: response[i].teacherPrice,
                                 checkWeek: response[i].checkWeek,
+                                selectedProductId: response[i].selectedProductId,
                             });
                         }
                         calendar.addEventSource(events);
@@ -437,6 +488,7 @@
                     $('#inputTeacherPrice').val(selectedEvent.teacherPrice);
                     $('#personalId').val(selectedEvent.personalId);
                     $('#checkWeek').val(selectedEvent.checkWeek);
+                    $('#selectedProductId').val(selectedEvent.selectedProductId);
                 }
 
                 $('#addAppointmentModal').modal();

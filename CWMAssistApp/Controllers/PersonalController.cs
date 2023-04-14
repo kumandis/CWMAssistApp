@@ -177,6 +177,17 @@ namespace CWMAssistApp.Controllers
             return Json("200");
         }
 
+        public JsonResult GetPersonalPrice(string id)
+        {
+            decimal price = 0;
+            if (string.IsNullOrEmpty(id) || id == "0")
+                return Json(price);
+
+            var personal = _context.Personals.SingleOrDefault(x => x.Id == Guid.Parse(id));
+            price = personal?.SeansPrice ?? 0;
+            return Json(price);
+        }
+
         public void ShowToastr(string message, ToastrType notificationType)
         {
             var msg = "toastr." + notificationType.ToString().ToLower() + "('" + message + "','" + notificationType + "')" + "";

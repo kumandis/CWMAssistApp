@@ -5,6 +5,7 @@ using CWMAssistApp.Services.Toastr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CWMAssistApp.Controllers
 {
@@ -27,7 +28,16 @@ namespace CWMAssistApp.Controllers
             {
                 var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
                 var result = _context.Packets.Where(x=> x.CompanyId == user.CompanyId && x.Status);
+                var productList = _context.Products.Where(x => x.CompanyId == user.CompanyId && x.Status);
+
                 model.PacketList = new List<Packet>();
+                model.ProductsSelectList = new List<SelectListItem>();
+
+                foreach (var product in productList)
+                {
+                    model.ProductsSelectList.Add(new SelectListItem(product.Name, product.Id.ToString()));
+                }
+
                 if (result.Any())
                 {
                     model.PacketList = result;
@@ -59,6 +69,8 @@ namespace CWMAssistApp.Controllers
                     return RedirectToAction("PacketList", "Packet");
                 }
 
+                var product = _context.Products.SingleOrDefault(x => x.Id == Guid.Parse(model.SelectedProductId));
+
                 var packet = new Packet()
                 {
                     CompanyId = user.CompanyId,
@@ -67,7 +79,9 @@ namespace CWMAssistApp.Controllers
                     PacketPrice = model.PacketPrice,
                     CreatedDate = DateTime.Now,
                     CreatedName = user.NormalizedUserName,
-                    Status = true
+                    Status = true,
+                    ProductId = product?.Id,
+                    ProductName = product?.Name
                 };
 
                 _context.Add(packet);

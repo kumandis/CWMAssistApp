@@ -17,9 +17,11 @@ namespace CWMAssistApp.Models
         public decimal LessonPrice { get; set; }
         public decimal TeacherPrice { get; set; }
         public bool CheckWeek { get; set; }
+        public string SelectedProductId { get; set; }
 
 
         public List<SelectListItem>? TeachersSelectList { get; internal set; }
+        public List<SelectListItem>? ProductsSelectList { get; internal set; }
 
     }
 }

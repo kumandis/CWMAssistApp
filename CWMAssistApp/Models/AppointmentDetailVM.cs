@@ -11,11 +11,13 @@ namespace CWMAssistApp.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Subject { get; set; }
-        public string PersonalId { get; set; }
+        public Guid? PersonalId { get; set; }
         public string? PersonalName { get; set; }
         public int Capacity { get; set; }
         public int MinAge { get; set; }
         public int MaxAge { get; set; }
+        public Guid? ProductId { get; set; }
+        public string? ProductName { get; set; }
         public decimal LessonPrice { get; set; }
         public decimal TeacherPrice { get; set; }
         public string? Title { get; set; }
@@ -29,6 +31,7 @@ namespace CWMAssistApp.Models
 
 
         public List<SelectListItem>? TeachersSelectList { get; internal set; }
+        public List<SelectListItem>? ProductsSelectList { get; internal set; }
         public List<RegistrationCustomer>? RegisteredCustomer { get; set; }
         public List<Customer>? CustomerList { get; set; }
     }

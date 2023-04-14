@@ -19,5 +19,7 @@ namespace CWMAssistApp.Data.Entity
         public decimal LessonPrice { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal TeacherPrice { get; set; }
+        public Guid? ProductId { get; set; }
+        public string? ProductName { get; set; }
     }
 }

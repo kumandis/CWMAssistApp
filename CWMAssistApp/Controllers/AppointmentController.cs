@@ -38,12 +38,21 @@ namespace CWMAssistApp.Controllers
                 }
 
                 var personals = _context.Personals.Where(x => x.CompanyId == user.CompanyId && x.Status);
+                var products = _context.Products.Where(x => x.CompanyId == user.CompanyId && x.Status);
+
                 model.TeachersSelectList = new List<SelectListItem>();
+                model.ProductsSelectList = new List<SelectListItem>();
                 
                 foreach (var personal in personals)
                 {
                     model.TeachersSelectList.Add(new SelectListItem(personal.Name, personal.Id.ToString()));
                 }
+
+                foreach (var product in products)
+                {
+                    model.ProductsSelectList.Add(new SelectListItem(product.Name, product.Id.ToString()));
+                }
+
             }
             catch (Exception ex)
             {
@@ -99,6 +108,8 @@ namespace CWMAssistApp.Controllers
 
                 var personal = _context.Personals.SingleOrDefault(x => x.Id == Guid.Parse(model.PersonalId));
 
+                var product = _context.Products.SingleOrDefault(x => x.Id == Guid.Parse(model.SelectedProductId));
+
                 var weekCounter = 0;
 
                 if (model.CheckWeek)
@@ -128,7 +139,9 @@ namespace CWMAssistApp.Controllers
                         Subject = model.Subject,
                         TeacherPrice = model.TeacherPrice,
                         Status = true,
-                        PersonalName = personal.Name
+                        PersonalName = personal.Name,
+                        ProductId = product?.Id,
+                        ProductName = product?.Name,
                     };
                     _context.Appointments.Add(appointment);
                     model.StartDate = model.StartDate.AddDays(1);
@@ -167,7 +180,7 @@ namespace CWMAssistApp.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                var personal = _context.Personals.SingleOrDefault(x => x.Id == Guid.Parse(model.PersonalId));
+                
 
                 var entity = _context.Appointments.SingleOrDefault(x => x.Id == model.Id);
 
@@ -184,12 +197,27 @@ namespace CWMAssistApp.Controllers
                 entity.LessonPrice == model.LessonPrice &&
                 entity.MaxAge == model.MaxAge &&
                 entity.MinAge == model.MinAge &&
-                entity.PersonalId == personal.Id &&
+                entity.PersonalId == model.PersonalId &&
                 entity.Subject == model.Subject &&
-                entity.TeacherPrice == model.TeacherPrice)
+                entity.TeacherPrice == model.TeacherPrice &&
+                entity.ProductId == model.ProductId)
                 {
                     ShowToastr("Değişiklik saptanamadı.", ToastrType.Warning);
                     return RedirectToAction("Detail", new { id = model.Id.ToString() });
+                }
+
+                if (entity.PersonalId != model.PersonalId)
+                {
+                    var personal = _context.Personals.SingleOrDefault(x => x.Id == model.PersonalId);
+                    entity.PersonalId = personal.Id;
+                    entity.PersonalName = personal.Name;
+                }
+
+                if (entity.ProductId != model.ProductId)
+                {
+                    var product = _context.Products.SingleOrDefault(x => x.Id == model.ProductId);
+                    entity.ProductId = product.Id;
+                    entity.ProductName = product.Name;
                 }
 
                 entity.Capacity = model.Capacity;
@@ -201,11 +229,10 @@ namespace CWMAssistApp.Controllers
                 entity.LessonPrice = model.LessonPrice;
                 entity.MaxAge = model.MaxAge;
                 entity.MinAge = model.MinAge;
-                entity.PersonalId = personal.Id;
                 entity.Subject = model.Subject;
                 entity.TeacherPrice = model.TeacherPrice;
                 entity.Status = true;
-                entity.PersonalName = personal.Name;
+                
 
                 _context.Update(entity);
                 _context.SaveChanges();
@@ -314,6 +341,17 @@ namespace CWMAssistApp.Controllers
                     
                 }
 
+                var products = _context.Products.Where(x => x.CompanyId == user.CompanyId && x.Status);
+                model.ProductsSelectList = new List<SelectListItem>();
+
+                foreach (var product in products)
+                {
+                    if (product.Id != appointment.ProductId)
+                    {
+                        model.ProductsSelectList.Add(new SelectListItem(product.Name, product.Id.ToString()));
+                    }
+                }
+
                 model.Title = appointment.Subject;
                 model.TitleDate = appointment.StartDate.ToLongDateString();
                 model.TitleHour = appointment.StartDate.ToString("HH:mm");
@@ -323,6 +361,8 @@ namespace CWMAssistApp.Controllers
                 model.MinAge = appointment.MinAge;
                 model.MaxAge = appointment.MaxAge;
                 model.Subject = appointment.Subject;
+                model.ProductId = appointment.ProductId;
+                model.ProductName = appointment.ProductName;
                 model.TeacherPrice = (int)appointment.TeacherPrice;
                 model.LessonPrice = (int)appointment.LessonPrice;
                 model.CustomerList = registrationCustomerList;
@@ -333,7 +373,7 @@ namespace CWMAssistApp.Controllers
                 model.DefinedIncome = _definedIncome;
                 model.SummaryIncome = model.DefinedIncome - model.DefinedExpense;
                 model.Id = appointment.Id;
-                model.PersonalId = appointment.PersonalId.ToString();
+                model.PersonalId = appointment.PersonalId;
                 model.PersonalName = appointment.PersonalName;
             }
             catch (Exception ex)
