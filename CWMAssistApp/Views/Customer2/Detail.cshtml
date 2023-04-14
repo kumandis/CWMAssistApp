@@ -110,15 +110,25 @@
                     <div class="modal-body">
                         <div class="form-group col-md-12">
                             <input type="hidden" id="customerId" value="@Model.CustomerId"/>
-                            <label for="">Paket Seçimi</label>
-                            <select name="packetId" id="packetId" class="form-control" asp-items="@Model.PacketsSelectList">
-                                @*<option value="0">Lütfen paket seçiniz.</option>*@
-                            </select>
+                            @if (Model.PacketsSelectList?.Count > 0)
+                            {
+                                <label for="">Paket Seçimi</label>
+                                <select name="packetId" id="packetId" class="form-control" asp-items="@Model.PacketsSelectList">
+                                    @*<option value="0">Lütfen paket seçiniz.</option>*@
+                                </select>
+                            }
+                            else
+                            {
+                                <label for="">Tanımlanabilecek bir paket bulunmuyor.</label>
+                            }
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
-                        <button type="button" id="btnSaveCustomerPacket" class="btn btn-primary">Paket Tanımla</button>
+                        @if (Model.PacketsSelectList?.Count > 0)
+                        {
+                            <button type="button" id="btnSaveCustomerPacket" class="btn btn-primary">Paket Tanımla</button>
+                        }
                     </div>
                 </div>
                 <!-- /.modal-content -->
@@ -259,6 +269,7 @@
                                     <span class="info-box-icon"><i class="far fa-bookmark"></i></span>
 
                                     <div class="info-box-content">
+                                        <span class="info-box-text">@customerPacket.ProductName</span>
                                         <span class="info-box-text">@customerPacket.PacketName</span>
                                         <span class="info-box-number">@customerPacket.UsedPieces/@customerPacket.PacketSize</span>
 
@@ -272,6 +283,10 @@
                                     <!-- /.info-box-content -->
                                 </div>
                             }
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-packet">Paket Tanımla</button>
+                            </div>
                         }
                         else
                         {

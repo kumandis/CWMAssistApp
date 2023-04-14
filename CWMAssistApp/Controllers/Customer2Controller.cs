@@ -129,6 +129,8 @@ namespace CWMAssistApp.Controllers
                     customerPacketVM.Add(new CustomerPacketVM()
                     {
                         PacketName = customerPacket.PacketName,
+                        ProductName = customerPacket.ProductName,
+                        ProductId = customerPacket?.ProductId,
                         UsedPieces = packetUsedCount,
                         PacketSize = customerPacket.PacketSize,
                         PacketCreatedElapsedTime = packetCreatedElapsedTime+1,
@@ -159,7 +161,10 @@ namespace CWMAssistApp.Controllers
 
                 foreach (var packet in packets)
                 {
-                    model.PacketsSelectList.Add(new SelectListItem(packet.Name, packet.Id.ToString()));
+                    if (customerPacketVM.Any(x=>x.ProductId == packet.ProductId) == false)
+                    {
+                        model.PacketsSelectList.Add(new SelectListItem(packet.Name, packet.Id.ToString()));
+                    }
                 }
             }
             catch (Exception ex)

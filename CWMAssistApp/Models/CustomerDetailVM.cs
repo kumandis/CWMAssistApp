@@ -26,6 +26,8 @@ namespace CWMAssistApp.Models
     {
         public Guid PacketId { get; set; }
         public string PacketName { get; set; }
+        public string? ProductName { get; set; }
+        public Guid? ProductId { get; set; }
         public int PacketSize { get; set; }
         public int UsedPieces { get; set; }
         public int PacketCreatedElapsedTime { get; set; }

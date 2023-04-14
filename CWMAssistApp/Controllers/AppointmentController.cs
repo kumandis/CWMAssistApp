@@ -544,6 +544,40 @@ namespace CWMAssistApp.Controllers
             return Json("200");
         }
 
+        [HttpPost]
+        public JsonResult DropAndResizeUpdate(DropAndResizeUpdateVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json("Parametreler hatalı");
+            }
+
+            try
+            {
+                var _appointmentGuid = Guid.Parse(model.AppointmentId);
+                var _startDate = DateTime.Parse(model.StartDate);
+                var _endDate = DateTime.Parse(model.EndDate);
+                var appointment = _context.Appointments.SingleOrDefault(x=> x.Id == _appointmentGuid && x.Status);
+                if (appointment == null)
+                {
+                    return Json("Güncellenecek randevu bulunamadı");
+                }
+
+                appointment.StartDate = _startDate;
+                appointment.EndDate = _endDate;
+
+                _context.Update(appointment);
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+
+            return Json("200");
+        }
+
         public void ShowToastr(string message, ToastrType notificationType)
         {
             var msg = "toastr." + notificationType.ToString().ToLower() + "('" + message + "','" + notificationType + "')" + "";

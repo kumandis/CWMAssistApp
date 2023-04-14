@@ -422,19 +422,22 @@
                     };
 
                     window.location.href = "/Appointment/Detail/" + info.event.id;
-
-                    //$('#appointmentId').val(info.event.extendedProps.userId);
-                    //$('#inputStartDate').val(moment(info.event.start).format('DD/MM/YYYY HH:mm'));
-                    //$('#inputEndDate').val(moment(info.event.end).format('DD/MM/YYYY HH:mm'))
-                    //$('#inputSubject').val(info.event.extendedProps.subject);
-                    //$('#inputCapacity').val(info.event.extendedProps.capacity);
-                    //$('#inputMinAge').val(info.event.extendedProps.minAge);
-                    //$('#inputMaxAge').val(info.event.extendedProps.maxAge);
-                    //$('#inputLessonPrice').val(info.event.extendedProps.lessonPrice);
-                    //$('#inputTeacherPrice').val(info.event.extendedProps.teacherPrice);
-                    //$('#personalId').val(info.event.extendedProps.personalId);
-
-                    //$('#selectAppointmentDetailModal').modal();
+                },
+                eventDrop: function (info){
+                    var appointment = {
+                        appointmentId: info.event.id,
+                        startDate: moment(info.event.start).format('DD/MM/YYYY HH:mm'),
+                        endDate: moment(info.event.end).format('DD/MM/YYYY HH:mm'),
+                    };
+                    updateDragAndResizeAppointment(appointment);
+                },
+                eventResize: function (info){
+                    var appointment = {
+                        appointmentId: info.event.id,
+                        startDate: moment(info.event.start).format('DD/MM/YYYY HH:mm'),
+                        endDate: moment(info.event.end).format('DD/MM/YYYY HH:mm'),
+                    };
+                    updateDragAndResizeAppointment(appointment);
                 }
             });
             calendar.render();
@@ -512,6 +515,24 @@
                     },
                     error: function () {
                         $('#saveModal').modal('hide');
+                        alertify.error('Erişim sağlanamadı.');
+                    }
+                });
+            }
+            
+            function updateDragAndResizeAppointment(data){
+                $.ajax({
+                    type: 'POST',
+                    url: '/appointment/DropAndResizeUpdate',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            alertify.success('Randevunuz başarıyla güncellendi.');
+                        } else {
+                            alertify.warning(response);
+                        }
+                    },
+                    error: function () {
                         alertify.error('Erişim sağlanamadı.');
                     }
                 });
