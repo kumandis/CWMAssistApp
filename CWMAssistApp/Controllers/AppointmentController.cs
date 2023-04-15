@@ -496,6 +496,16 @@ namespace CWMAssistApp.Controllers
 
                     _context.CustomerAppointments.Update(customerAppointment);
                     _context.SaveChanges();
+
+                    var customerPacket =
+                        _context.CustomerPackets.SingleOrDefault(x => x.Id == customerAppointment.PacketId);
+
+                    if (customerPacket is { Status: false })
+                    {
+                        customerPacket.Status = true;
+                        _context.CustomerPackets.Update(customerPacket);
+                        _context.SaveChanges();
+                    }
                 }
             }
             catch (Exception ex)
