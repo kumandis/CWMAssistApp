@@ -206,7 +206,15 @@
                                         <td>@item.PhoneNumber</td>
                                         @if (item.IsPacket)
                                         {
-                                            <td><span class="badge bg-warning">Paket</span></td>
+                                            @if (item.IsActivePacket)
+                                            {
+                                                <td><span class="badge bg-warning">Paket</span></td>
+                                            }
+                                            else
+                                            {
+                                                <td><span class="badge bg-danger">Paket</span></td>
+                                            }
+                                            
                                         }
                                         else
                                         {

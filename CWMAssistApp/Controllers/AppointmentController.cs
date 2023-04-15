@@ -303,6 +303,7 @@ namespace CWMAssistApp.Controllers
                 var registratedCustomers = new List<RegistrationCustomer>();
                 var indexNumber = 1;
                 decimal _definedIncome = 0;
+                var _isActivePacket = false;
                 foreach (var customerAppointment in registratedCustomerList)
                 {
                     var customerEntity = _context.Customers.SingleOrDefault(x => x.Id == customerAppointment.CustomerId);
@@ -311,6 +312,7 @@ namespace CWMAssistApp.Controllers
                     {
                         var customerPacket = _context.CustomerPackets.Single(x => x.Id == customerAppointment.PacketId);
                         _definedIncome += customerPacket.OneLessonPrice;
+                        _isActivePacket = customerPacket.Status;
                     }
                     else
                     {
@@ -324,7 +326,8 @@ namespace CWMAssistApp.Controllers
                         Name = customerEntity.Name +" "+ customerEntity.Surname,
                         PhoneNumber = customerEntity.PhoneNumber,
                         IndexNumber = indexNumber,
-                        CustomerId = customerEntity.Id
+                        CustomerId = customerEntity.Id,
+                        IsActivePacket = _isActivePacket
                     });
                     indexNumber++;
                 }

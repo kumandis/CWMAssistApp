@@ -48,5 +48,6 @@ namespace CWMAssistApp.Models
         public int PacketCount { get; set; }
         public int RemainingCount { get; set; }
         public string PacketText { get; set; }
+        public bool IsActivePacket { get; set; }
     }
 }
