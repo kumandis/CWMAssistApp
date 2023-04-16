@@ -1,6 +1,7 @@
 ﻿using CWMAssistApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Runtime.InteropServices.JavaScript;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Client;
 using CWMAssistApp.Data.Entity;
@@ -27,10 +28,23 @@ namespace CWMAssistApp.Controllers
         {
             var vm = new IndexVM();
             var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
+            var now = DateTime.Now;
 
-            vm.TotalAppointmentCount = _context.Appointments.Count(x => x.CompanyId == user.CompanyId && x.Status && x.StartDate < DateTime.Now);
-            vm.TotalVisitorCount = _context.CustomerAppointments.Count(x => x.CompanyId == user.CompanyId && x.Status && x.AppointmentDate < DateTime.Now);
-            vm.TotalUniqueVisitorCount = _context.Customers.Count(x => x.StoreId == user.CompanyId);
+            var startDate = new DateTime(now.Year, now.Month, 1, 0, 0, 0);
+
+            vm.MonthName = now.ToString("MMMM");
+            vm.TotalAppointmentCount = _context.Appointments.Count(x => x.CompanyId == user.CompanyId && x.Status && x.StartDate > startDate && x.StartDate < now);
+
+            var totalVisitorsInMonth = _context.CustomerAppointments.Where(x =>
+                    x.CompanyId == user.CompanyId && x.Status && x.AppointmentDate > startDate &&
+                    x.AppointmentDate < now)
+                .ToList();
+
+            vm.TotalVisitorCount = totalVisitorsInMonth.Count();
+            vm.TotalUniqueVisitorCount = totalVisitorsInMonth.GroupBy(x => x.CustomerId).Count();
+            vm.TimelineStartText = now.ToString("dd") + " " + vm.MonthName;
+
+            vm.Appointments = GetDailyAppointmentsDetailsByDate(user, now);
 
             return View(vm);
         }
@@ -1262,6 +1276,52 @@ namespace CWMAssistApp.Controllers
                 
             }
             _context.SaveChanges();
+        }
+
+        public List<AppointmentIndexVm> GetDailyAppointmentsDetailsByDate(AppUser user,DateTime date)
+        {
+            var result = new List<AppointmentIndexVm>();
+            var startDate = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
+            var endDate = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
+
+            var dailyAppointments = _context.Appointments.Where(x =>
+                x.CompanyId == user.CompanyId &&
+                x.StartDate > startDate &&
+                x.StartDate < endDate &&
+                x.Status);
+
+            result = new List<AppointmentIndexVm>();
+            foreach (var appointment in dailyAppointments)
+            {
+                var appointmentIndexVm = new AppointmentIndexVm();
+                appointmentIndexVm.AppointmentId = appointment.Id;
+                appointmentIndexVm.AppointmentHour = appointment.StartDate.ToString("t");
+                appointmentIndexVm.TeacherName = appointment.PersonalName;
+                appointmentIndexVm.Subject = appointment.Subject;
+
+                var query = from customerAppointment in _context.CustomerAppointments
+                    join customer in _context.Customers on customerAppointment.CustomerId equals customer.Id
+                    where customerAppointment.AppointmentId == appointment.Id && customerAppointment.Status == true
+                    select new { customer.Name,customer.Surname, customer.PhoneNumber };
+
+                appointmentIndexVm.CustomerAppointments = new List<CustomerAppointmentIndexVm>();
+
+                var indexCount = 1;
+                foreach (var customer in query)
+                {
+                    var cstApp = new CustomerAppointmentIndexVm()
+                    {
+                        Name = customer.Name + " " + customer.Surname,
+                        PhoneNumber = customer.PhoneNumber,
+                        RowNumber = indexCount
+                    };
+                    indexCount++;
+                    appointmentIndexVm.CustomerAppointments.Add(cstApp);
+                }
+                result.Add(appointmentIndexVm);
+            }
+
+            return result;
         }
     }
 }

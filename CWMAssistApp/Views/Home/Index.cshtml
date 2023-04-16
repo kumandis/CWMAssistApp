@@ -41,8 +41,9 @@
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>@Model.TotalAppointmentCount<sup style="font-size: 20px"></sup></h3>
-
-                        <p>Toplam Yapılan Atölye</p>
+                        
+                        <p>Gerçekleşen Atölye</p>
+                        (@Model.MonthName)
                     </div>
                     <div class="icon">
                         <i class="ion ion-stats-bars"></i>
@@ -60,6 +61,7 @@
                         <h3>@Model.TotalVisitorCount</h3>
 
                         <p>Toplam Ziyaretçi</p>
+                        (@Model.MonthName)
                     </div>
                     <div class="icon">
                         <i class="fas fa-user-plus"></i>
@@ -76,7 +78,8 @@
                     <div class="inner">
                         <h3>@Model.TotalUniqueVisitorCount</h3>
 
-                        <p>Farklı Müşteri</p>
+                        <p>Farklı Ziyaretçi</p>
+                        (@Model.MonthName)
                     </div>
                     <div class="icon">
                         <i class="fas fa-chart-pie"></i>
@@ -96,6 +99,52 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="timeline timeline-inverse">
+                            <div class="time-label">
+                                <span class="bg-danger">
+                                    @Model.TimelineStartText
+                                </span>
+                            </div>
+                            @foreach (var item in @Model.Appointments)
+                            {
+                                <div>
+                                    <i class="fas fa-book-open bg-primary"></i>
+                                
+                                    <div class="timeline-item">
+                                        <span class="time">
+                                            <i class="far fa-clock"></i> @item.AppointmentHour
+                                        </span>
+                                        <h3 class="timeline-header">
+                                            <a href="#">@item.Subject</a> @item.TeacherName
+                                        </h3>
+                                        <div class="timeline-body">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                </thead>
+                                                <tbody>
+                                                @foreach (var customer in @item.CustomerAppointments)
+                                                {
+                                                    <tr>
+                                                        <td>@customer.RowNumber</td>
+                                                        <td>@customer.Name</td>
+                                                        <td>@customer.PhoneNumber</td>
+                                                    </tr>
+                                                }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            
+
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header border-0">
@@ -135,7 +184,13 @@
                     </div>
                 </div>
             </div>
-            
+
+
+        </div>
+        @*<div class="row">
+            <div class="col-lg-6">
+
+            </div>
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header border-0">
@@ -175,9 +230,11 @@
                     </div>
                 </div>
                 <!-- /.card -->
-                
+
             </div>
-        </div>
+            <div class="col-lg-6">
+            </div>
+        </div>*@
     </div>
 </div>
 
