@@ -118,7 +118,7 @@
                                             <i class="far fa-clock"></i> @item.AppointmentHour
                                         </span>
                                         <h3 class="timeline-header">
-                                            <a href="#">@item.Subject</a> @item.TeacherName
+                                            <a href="javascript:getAppointmentDetail('@item.AppointmentId');">@item.Subject</a> @item.TeacherName
                                         </h3>
                                         <div class="timeline-body">
                                             <div class="card collapsed-card">
@@ -262,6 +262,9 @@
 
     <script>
 
+        function getAppointmentDetail(appointmentId){
+            window.location.href = "/Appointment/Detail/" + appointmentId;
+        }
 
         $(function () {
             'use strict'
