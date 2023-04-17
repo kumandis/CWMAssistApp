@@ -396,6 +396,11 @@ namespace CWMAssistApp.Controllers
                 return Json("Randevu bilgileri hatalı");
             }
 
+            return SaveCustomer(model.AppointmentId, model.CustomerIdList);
+        }
+
+        private JsonResult SaveCustomer(string modelAppointmentId, List<string> modelCustomerIdList)
+        {
             try
             {
                 var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
@@ -404,20 +409,20 @@ namespace CWMAssistApp.Controllers
                 {
                     return Json("Kullanıcı bulunamadı");
                 }
-                var _appointmentGuid = Guid.Parse(model.AppointmentId);
+                var _appointmentGuid = Guid.Parse(modelAppointmentId);
                 var _appointment = _context.Appointments.SingleOrDefault(x => x.Id == _appointmentGuid);
                 CustomerAppointment customerAppointment;
 
-                foreach (var customerId in model.CustomerIdList)
+                foreach (var customerId in modelCustomerIdList)
                 {
                     var _customerGuid = Guid.Parse(customerId);
-                    
+
 
                     var _packetOwerflow = false;
 
 
                     var customerActivePacket = _context.CustomerPackets.Where(x => x.CustomerId == _customerGuid && x.ProductId == _appointment.ProductId && x.Status).
-                        OrderBy(t=>t.CreatedDate).FirstOrDefault();
+                        OrderBy(t => t.CreatedDate).FirstOrDefault();
 
                     if (customerActivePacket != null)
                     {
@@ -427,7 +432,7 @@ namespace CWMAssistApp.Controllers
                         if (activePacketUsedCount == customerActivePacket.PacketSize)
                         {
                             _packetOwerflow = true;
-                            
+
                         }
 
                         if (activePacketUsedCount + 1 >= customerActivePacket.PacketSize)
@@ -442,7 +447,7 @@ namespace CWMAssistApp.Controllers
                         ? PaymentType.Packet
                         : PaymentType.Cash;
 
-                    
+
 
                     customerAppointment = new CustomerAppointment()
                     {
@@ -459,7 +464,7 @@ namespace CWMAssistApp.Controllers
                     _context.CustomerAppointments.Add(customerAppointment);
                     _context.SaveChanges();
 
-                    CreateCustomerAppointmentInfoSms(user,_customerGuid,_appointment.StartDate);
+                    CreateCustomerAppointmentInfoSms(user, _customerGuid, _appointment.StartDate);
 
                 }
 
@@ -472,7 +477,6 @@ namespace CWMAssistApp.Controllers
             return Json("200");
         }
 
-        
 
         [HttpPost]
         public JsonResult CancelCustomerAppointment(CancelCustomerAppointmentVM model)
@@ -620,6 +624,38 @@ namespace CWMAssistApp.Controllers
                 _context.SaveChanges();
             }
 
+        }
+
+        [HttpPost]
+        public JsonResult CopyAppointment(CopyAppointmentModel model)
+        {
+            try
+            {
+                var _appointmentId = Guid.Parse(model.AppointmentId);
+                var _appointmentStartDate = DateTime.Parse(model.NewAppointmentStartDate);
+
+                var appointment = _context.Appointments.SingleOrDefault(x => x.Id == _appointmentId);
+                var appointmentTime = appointment.EndDate - appointment.StartDate;
+
+                var _appointmentEndDate = _appointmentStartDate.AddMinutes(appointmentTime.Minutes);
+
+                appointment.StartDate = _appointmentStartDate;
+                appointment.EndDate = _appointmentEndDate;
+                appointment.Id = Guid.Empty;
+
+                var newAppointment = _context.Appointments.Add(appointment);
+                _context.SaveChanges();
+
+                var appointmentCustomers = _context.CustomerAppointments
+                    .Where(x => x.AppointmentId == Guid.Parse(model.AppointmentId)).Select(s => s.CustomerId.ToString()).ToList();
+
+                SaveCustomer(newAppointment.Entity.Id.ToString(), appointmentCustomers);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+            return Json("200");
         }
 
         public void ShowToastr(string message, ToastrType notificationType)
