@@ -229,7 +229,20 @@
     <script>
     
         function GetCustomerDetail(id){
+
+            //$.ajax({
+            //    type: 'POST',
+            //    url: '/SmsQueue/SendWaitingSms',
+            //    success: function (response) {
+
+            //    },
+            //    error: function () {
+            //        alertify.error('Personel bilgileri alınırken hata oluştu');
+            //    }
+            //});
+
             window.location.href = "/Customer2/Detail/"+id
+
         }
 
         $(function () {

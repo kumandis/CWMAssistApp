@@ -1,5 +1,6 @@
 ﻿using CWMAssistApp.Data.Entity;
 using CWMAssistApp.Data;
+using CWMAssistApp.Extention;
 using CWMAssistApp.Models;
 using CWMAssistApp.Services.Toastr;
 using Microsoft.AspNetCore.Identity;
@@ -600,13 +601,16 @@ namespace CWMAssistApp.Controllers
             if (user.IsProPacket)
             {
                 var customer = _context.Customers.SingleOrDefault(x => x.Id == customerGuid);
-                var msgBody = String.Format($"Sevgili {0} müşterisi, {1}'da gerçekleşecek olan atölyeye kaydınız yapılmıştır.",user.CompanyName,appointmentStartDate.ToString("f"));
+                var msgBody =
+                    $"Sevgili {user.CompanyName} müşterisi, {appointmentStartDate.ToString("f")}'da gerçekleşecek olan atölyeye kaydınız yapılmıştır.";
+
+                var formattedPhoneNumber = SmsHelper.ConvertPhoneNumberToSmsType(customer.PhoneNumber);
 
                 var msg = new Message()
                 {
                     CompanyId = user.CompanyId,
                     CustomerId = customer.Id,
-                    ReceiverPhoneNumber = customer.PhoneNumber,
+                    ReceiverPhoneNumber = formattedPhoneNumber,
                     Status = true,
                     CreatedDate = DateTime.Now,
                     CreatedName = user.NormalizedUserName,
