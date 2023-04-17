@@ -637,7 +637,7 @@ namespace CWMAssistApp.Controllers
                 var appointment = _context.Appointments.SingleOrDefault(x => x.Id == _appointmentId);
                 var appointmentTime = appointment.EndDate - appointment.StartDate;
 
-                var _appointmentEndDate = _appointmentStartDate.AddMinutes(appointmentTime.Minutes);
+                var _appointmentEndDate = _appointmentStartDate.AddHours(appointmentTime.Hours).AddMinutes(appointmentTime.Minutes);
 
                 appointment.StartDate = _appointmentStartDate;
                 appointment.EndDate = _appointmentEndDate;
