@@ -44,7 +44,10 @@ namespace CWMAssistApp.Controllers
             vm.TotalUniqueVisitorCount = totalVisitorsInMonth.GroupBy(x => x.CustomerId).Count();
             vm.TimelineStartText = now.ToString("dd") + " " + vm.MonthName;
 
-            vm.Appointments = GetDailyAppointmentsDetailsByDate(user, now);
+            var dailyAppointments = GetDailyAppointmentsDetailsByDate(user, now);
+            vm.Appointments = dailyAppointments.Appointments;
+            vm.DailyVisitorCount = dailyAppointments.DailyVisitorCount;
+            vm.DailyTotalIncome = dailyAppointments.DailyTotalIncome;
 
             return View(vm);
         }
@@ -1278,22 +1281,25 @@ namespace CWMAssistApp.Controllers
             _context.SaveChanges();
         }
 
-        public List<AppointmentIndexVm> GetDailyAppointmentsDetailsByDate(AppUser user,DateTime date)
+        public IndexVM GetDailyAppointmentsDetailsByDate(AppUser user,DateTime date)
         {
-            var result = new List<AppointmentIndexVm>();
+            var result = new IndexVM();
             var startDate = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
             var endDate = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
+            var dailyVisitorCount = 0;
+            decimal dailyTotalIncome = 0;
 
             var dailyAppointments = _context.Appointments.Where(x =>
                 x.CompanyId == user.CompanyId &&
                 x.StartDate > startDate &&
                 x.StartDate < endDate &&
-                x.Status);
+                x.Status).OrderBy(t => t.StartDate);
 
-            result = new List<AppointmentIndexVm>();
+            result.Appointments = new List<AppointmentIndexVm>();
             foreach (var appointment in dailyAppointments)
             {
                 var appointmentIndexVm = new AppointmentIndexVm();
+                
                 appointmentIndexVm.AppointmentId = appointment.Id;
                 appointmentIndexVm.AppointmentHour = appointment.StartDate.ToString("t");
                 appointmentIndexVm.TeacherName = appointment.PersonalName;
@@ -1302,13 +1308,23 @@ namespace CWMAssistApp.Controllers
                 var query = from customerAppointment in _context.CustomerAppointments
                     join customer in _context.Customers on customerAppointment.CustomerId equals customer.Id
                     where customerAppointment.AppointmentId == appointment.Id && customerAppointment.Status == true
-                    select new { customer.Name,customer.Surname, customer.PhoneNumber };
+                    select new { customer.Name,customer.Surname, customer.PhoneNumber, customerAppointment.PaymentType, customerAppointment.PacketId };
 
                 appointmentIndexVm.CustomerAppointments = new List<CustomerAppointmentIndexVm>();
 
                 var indexCount = 1;
+                dailyVisitorCount += query.Count();
                 foreach (var customer in query)
                 {
+                    if (customer.PaymentType == (int)PaymentType.Cash)
+                    {
+                        dailyTotalIncome += appointment.LessonPrice;
+                    }
+                    else if (customer.PaymentType == (int)PaymentType.Packet)
+                    {
+                        var customerActivePacket = _context.CustomerPackets.SingleOrDefault(x => x.Id == customer.PacketId);
+                        if (customerActivePacket != null) dailyTotalIncome += customerActivePacket.OneLessonPrice;
+                    }
                     var cstApp = new CustomerAppointmentIndexVm()
                     {
                         Name = customer.Name + " " + customer.Surname,
@@ -1318,9 +1334,10 @@ namespace CWMAssistApp.Controllers
                     indexCount++;
                     appointmentIndexVm.CustomerAppointments.Add(cstApp);
                 }
-                result.Add(appointmentIndexVm);
+                result.Appointments.Add(appointmentIndexVm);
             }
-
+            result.DailyVisitorCount = dailyVisitorCount;
+            result.DailyTotalIncome = dailyTotalIncome;
             return result;
         }
     }

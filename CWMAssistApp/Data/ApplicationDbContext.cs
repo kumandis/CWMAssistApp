@@ -17,5 +17,8 @@ namespace CWMAssistApp.Data
         public DbSet<CustomerAppointment> CustomerAppointments { get; set; }
         public DbSet<CustomerPacket> CustomerPackets { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<SmsPacket> SmsPackets { get; set; }
+        public DbSet<UserSmsPacket> UserSmsPackets { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }

@@ -8,6 +8,8 @@
         public int TotalUniqueVisitorCount { get; set; }
         public string TimelineStartText { get; set; }
         public List<AppointmentIndexVm> Appointments { get; set; }
+        public int DailyVisitorCount { get; set; }
+        public decimal DailyTotalIncome { get; set; }
     }
 
     public class CustomerAppointmentIndexVm

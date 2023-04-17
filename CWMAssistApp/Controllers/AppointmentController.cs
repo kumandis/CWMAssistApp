@@ -457,6 +457,9 @@ namespace CWMAssistApp.Controllers
                     };
                     _context.CustomerAppointments.Add(customerAppointment);
                     _context.SaveChanges();
+
+                    CreateCustomerAppointmentInfoSms(user,_customerGuid,_appointment.StartDate);
+
                 }
 
             }
@@ -467,6 +470,8 @@ namespace CWMAssistApp.Controllers
 
             return Json("200");
         }
+
+        
 
         [HttpPost]
         public JsonResult CancelCustomerAppointment(CancelCustomerAppointmentVM model)
@@ -589,6 +594,28 @@ namespace CWMAssistApp.Controllers
             }
 
             return Json("200");
+        }
+        private void CreateCustomerAppointmentInfoSms(AppUser user, Guid customerGuid, DateTime appointmentStartDate)
+        {
+            if (user.IsProPacket)
+            {
+                var customer = _context.Customers.SingleOrDefault(x => x.Id == customerGuid);
+                var msgBody = String.Format($"Sevgili {0} müşterisi, {1}'da gerçekleşecek olan atölyeye kaydınız yapılmıştır.",user.CompanyName,appointmentStartDate.ToString("f"));
+
+                var msg = new Message()
+                {
+                    CompanyId = user.CompanyId,
+                    CustomerId = customer.Id,
+                    ReceiverPhoneNumber = customer.PhoneNumber,
+                    Status = true,
+                    CreatedDate = DateTime.Now,
+                    CreatedName = user.NormalizedUserName,
+                    MessageBody = msgBody
+                };
+                _context.Messages.Add(msg);
+                _context.SaveChanges();
+            }
+
         }
 
         public void ShowToastr(string message, ToastrType notificationType)

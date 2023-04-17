@@ -8,5 +8,6 @@ namespace CWMAssistApp.Data.Entity
         public string CompanyName { get; set; }
         public Guid CompanyId { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsProPacket { get; set; }
     }
 }
