@@ -618,7 +618,6 @@ namespace CWMAssistApp.Controllers
                             customer.Id);
                 }
 
-                
 
                 //var msg = new Message()
                 //{
