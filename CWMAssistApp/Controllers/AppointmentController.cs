@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CWMAssistApp.Controllers
 {
@@ -610,21 +611,29 @@ namespace CWMAssistApp.Controllers
 
                 var formattedPhoneNumber = SmsHelper.ConvertPhoneNumberToSmsType(customer.PhoneNumber);
 
-                var msg = new Message()
+                if (!formattedPhoneNumber.IsNullOrEmpty() && formattedPhoneNumber != "5555555555")
                 {
-                    CompanyId = user.CompanyId,
-                    CustomerId = customer.Id,
-                    ReceiverPhoneNumber = formattedPhoneNumber,
-                    Status = true,
-                    CreatedDate = DateTime.Now,
-                    CreatedName = user.NormalizedUserName,
-                    MessageBody = msgBody,
-                    Code = String.Empty
-                };
-                _context.Messages.Add(msg);
-                _context.SaveChanges();
-            }
+                    var result =
+                        new SmsQueueController(_context).SendSingleMessage(msgBody, formattedPhoneNumber, user.CompanyId,
+                            customer.Id);
+                }
 
+                
+
+                //var msg = new Message()
+                //{
+                //    CompanyId = user.CompanyId,
+                //    CustomerId = customer.Id,
+                //    ReceiverPhoneNumber = formattedPhoneNumber,
+                //    Status = true,
+                //    CreatedDate = DateTime.Now,
+                //    CreatedName = user.NormalizedUserName,
+                //    MessageBody = msgBody,
+                //    Code = String.Empty
+                //};
+                //_context.Messages.Add(msg);
+                //_context.SaveChanges();
+            }
         }
 
         [HttpPost]

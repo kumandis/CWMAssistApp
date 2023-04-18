@@ -5,22 +5,87 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Client;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CWMAssistApp.Controllers
 {
+    [Authorize]
     public class SmsQueueController : Controller
     {
-        private UserManager<AppUser> _userManager;
         private ApplicationDbContext _context;
         private const string postAddress = "https://api.netgsm.com.tr/sms/send/xml";
 
-        public SmsQueueController(UserManager<AppUser> userManager, ApplicationDbContext context)
+        public SmsQueueController(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
+        public string SendSingleMessage(string msg, string receiverPhoneNumber ,Guid companyId, Guid customerId)
+        {
+            var result = "";
+            try
+            {
+                var userSmsPacket = _context.UserSmsPackets.SingleOrDefault(x => x.CompanyId == companyId && x.Status);
+
+                if (userSmsPacket != null && userSmsPacket.Status)
+                {
+                    var cdata = "<mp><msg><![CDATA[" + msg + "]]></msg><no>" + receiverPhoneNumber + "</no></mp>";
+
+                    string ss = "";
+                    ss += "<?xml version='1.0' encoding='UTF-8'?>";
+                    ss += "<mainbody>";
+                    ss += "<header>";
+                    ss += "<company dil='TR'>Netgsm</company>";
+                    ss += "<usercode>" + userSmsPacket.ServiceUserName + "</usercode>";
+                    ss += "<password>" + userSmsPacket.ServicePassword + "</password>";
+                    ss += "<type>n:n</type>";
+                    ss += "<msgheader>" + userSmsPacket.ServiceUserName + "</msgheader>";
+                    ss += "</header>";
+                    ss += "<body>";
+                    ss += cdata;
+                    ss += "</body>";
+                    ss += "</mainbody>";
+                    var response = XMLPOST(ss);
+
+                    var messageEntity = new Message()
+                    {
+                        CompanyId = companyId,
+                        CreatedDate = DateTime.Now,
+                        CreatedName = "SINGLE_SMS_SERVICE",
+                        CustomerId = customerId,
+                        MessageBody = msg,
+                        ReceiverPhoneNumber = receiverPhoneNumber,
+                        Status = true
+                    };
+
+                    var responseStatus = response.Substring(0, 2);
+                    var responseCode = response.Substring(3);
+
+                    if (responseStatus == "00" || responseStatus == "01" || responseStatus == "02")
+                    {
+                        messageEntity.Code = responseCode;
+                        messageEntity.Status = false;
+                        result = responseCode;
+                    }
+                    else
+                    {
+                        result = "SMS Gönderimi Başarısız";
+                    }
+
+                    _context.Add(messageEntity);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+
+            return result;
+        }
         public JsonResult SendWaitingSms()
         {
             var messageQueue = _context.Messages.Where(x => x.Status && x.ReceiverPhoneNumber != "5555555555");
