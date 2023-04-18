@@ -7,5 +7,6 @@
         public Guid CustomerId { get; set; }
         public string MessageBody { get; set; }
         public string ReceiverPhoneNumber { get; set; }
+        public string Code { get; set; }
     }
 }

@@ -606,7 +606,7 @@ namespace CWMAssistApp.Controllers
             {
                 var customer = _context.Customers.SingleOrDefault(x => x.Id == customerGuid);
                 var msgBody =
-                    $"Sevgili {user.CompanyName} müşterisi, {appointmentStartDate.ToString("f")}'da gerçekleşecek olan atölyeye kaydınız yapılmıştır.";
+                    $"Sevgili {user.CompanyName} ziyaretçisi, {appointmentStartDate.ToString("f")}'da gerçekleşecek olan atölyeye kaydınız yapılmıştır.";
 
                 var formattedPhoneNumber = SmsHelper.ConvertPhoneNumberToSmsType(customer.PhoneNumber);
 
@@ -618,7 +618,8 @@ namespace CWMAssistApp.Controllers
                     Status = true,
                     CreatedDate = DateTime.Now,
                     CreatedName = user.NormalizedUserName,
-                    MessageBody = msgBody
+                    MessageBody = msgBody,
+                    Code = String.Empty
                 };
                 _context.Messages.Add(msg);
                 _context.SaveChanges();

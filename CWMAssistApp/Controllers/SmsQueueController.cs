@@ -23,7 +23,7 @@ namespace CWMAssistApp.Controllers
 
         public JsonResult SendWaitingSms()
         {
-            var messageQueue = _context.Messages.Where(x => x.Status);
+            var messageQueue = _context.Messages.Where(x => x.Status && x.ReceiverPhoneNumber != "5555555555");
 
             var messageOwners = messageQueue.GroupBy(x => x.CompanyId).Select(s => s.Key);
             foreach (var owner in messageOwners)
@@ -57,6 +57,22 @@ namespace CWMAssistApp.Controllers
                     ss += "</body>";
                     ss += "</mainbody>";
                     var response = XMLPOST(ss);
+
+                    var responseStatus = response.Substring(0, 2);
+                    var responseCode = response.Substring(3);
+
+                    if (responseStatus == "00" || responseStatus == "01" || responseStatus == "02")
+                    {
+                        foreach (var data in msgQueue)
+                        {
+                            data.Status = false;
+                            data.Code = responseCode;
+
+                            _context.Update(data);
+                            _context.SaveChanges();
+                        }
+                        return Json("SMS ler Gönderildi. Code :" + responseCode);
+                    }
                 }
             }
             return Json("200");
