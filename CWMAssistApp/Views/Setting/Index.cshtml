@@ -29,7 +29,7 @@
                         <ul class="nav nav-pills">
                             <li class="nav-item"><a class="nav-link active" href="#smsSettings" data-toggle="tab">SMS Ayarları</a></li>
                             <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#bulkSms" data-toggle="tab">Toplu SMS</a></li>
                         </ul>
                     </div><!-- /.card-header -->
 
@@ -41,8 +41,30 @@
                             <div class="tab-pane" id="timeline">
                                 2
                             </div>
-                            <div class="tab-pane" id="settings">
-                                3
+                            <div class="tab-pane" id="bulkSms">
+                                <div class="card card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Toplu SMS</h3>
+                                    </div>
+                                    <!-- /.card-header -->
+                                    
+                                    <form id="sendBulkSms" asp-controller="Setting" asp-action="SendBulkSms" method="post">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <!-- textarea -->
+                                                    <div class="form-group">
+                                                        <label>Mesaj</label>
+                                                        <textarea name="message" class="form-control" placeholder="Mesaj.."></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="submit" class="btn btn-primary">Gönder</button>
+                                        </div>
+                                    </form>
+                                    
                             </div>
                         </div>
                     </div>

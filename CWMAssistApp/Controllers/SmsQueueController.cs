@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
+using CWMAssistApp.Extention;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Client;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,7 +22,57 @@ namespace CWMAssistApp.Controllers
         {
             _context = context;
         }
+        public string SendBulkMessage(string msg, Guid companyId)
+        {
+            var result = "";
+            var defaultPhoneNumber = "0 (555) 555 55 55";
+            var cData = "<![CDATA["+msg+"]]>";
+            try
+            {
+                var userSmsPacket = _context.UserSmsPackets.SingleOrDefault(x => x.CompanyId == companyId && x.Status);
+                var customerList =
+                    _context.Customers.Where(x => x.StoreId == companyId && x.PhoneNumber != defaultPhoneNumber);
 
+                var phoneNumberList = customerList.Select(x => x.PhoneNumber);
+
+                var noList = "";
+
+                foreach (var item in phoneNumberList)
+                {
+                    noList += "<no>"+SmsHelper.ConvertPhoneNumberToSmsType(item) +"</no>";
+                }
+
+                if (userSmsPacket != null && userSmsPacket.Status && customerList != null)
+                {
+                    string ss = "";
+                    ss += "<?xml version='1.0' encoding='UTF-8'?>";
+                    ss += "<mainbody>";
+                    ss += "<header>";
+                    ss += "<company dil='TR'>Netgsm</company>";
+                    ss += "<usercode>" + userSmsPacket.ServiceUserName + "</usercode>";
+                    ss += "<password>" + userSmsPacket.ServicePassword + "</password>";
+                    ss += "<type>1:n</type>";
+                    ss += "<msgheader>"+ userSmsPacket.ServiceUserName +"</msgheader>";
+                    ss += "</header>";
+                    ss += "<body>";
+                    ss += "<msg>";
+                    ss += msg;
+                    ss += "</msg>";
+                    ss += noList;
+                    ss += "</body>  ";
+                    ss += "</mainbody>";
+                    var response = XMLPOST( ss);
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+
+            return result;
+        }
         public string SendSingleMessage(string msg, string receiverPhoneNumber ,Guid companyId, Guid customerId)
         {
             var result = "";
@@ -142,6 +193,8 @@ namespace CWMAssistApp.Controllers
             }
             return Json("200");
         }
+
+
 
         private string XMLPOST(string xmlData)
         {
