@@ -258,7 +258,8 @@ namespace CWMAssistApp.Controllers
                     OneLessonPrice = packet.PacketPrice / packet.PacketSize,
                     PacketName = packet.Name,
                     ProductId = packet.ProductId,
-                    ProductName = packet.ProductName
+                    ProductName = packet.ProductName,
+                    CompanyId = user.CompanyId
                 };
                 _context.CustomerPackets.Add(customerPacket);
                 _context.SaveChanges();

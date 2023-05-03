@@ -10,6 +10,7 @@
         public List<AppointmentIndexVm> Appointments { get; set; }
         public int DailyVisitorCount { get; set; }
         public decimal DailyTotalIncome { get; set; }
+        public int TotalActivePacketCount { get; set; }
     }
 
     public class CustomerAppointmentIndexVm

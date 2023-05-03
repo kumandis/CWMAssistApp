@@ -6,6 +6,7 @@ namespace CWMAssistApp.Data.Entity
     public class CustomerPacket : BaseEntity
     {
         public Guid Id { get; set; }
+        public Guid CompanyId { get; set; }
         public Guid CustomerId { get; set; }
         public Guid PacketId { get; set; }
         public string PacketName { get; set; }

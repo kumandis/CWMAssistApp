@@ -208,17 +208,31 @@
                                         {
                                             @if (item.IsActivePacket)
                                             {
-                                                <td><span class="badge bg-warning">Paket</span></td>
+                                                <td>
+                                                    <button class="btn btn-primary-outline">
+                                                        <span class="badge bg-warning">Paket</span>
+                                                    </button>
+                                                </td>
                                             }
                                             else
                                             {
-                                                <td><span class="badge bg-danger">Paket</span></td>
+                                                <td>
+                                                    <button class="btn btn-primary-outline">
+                                                        <span class="badge bg-danger">Paket</span>
+                                                    </button>
+                                                    
+                                                </td>
                                             }
                                             
                                         }
                                         else
                                         {
-                                            <td><span class="badge bg-info">Nakit</span></td>
+                                            <td>
+                                                <button class="btn btn-primary-outline">
+                                                    <span class="badge bg-info">Nakit</span>
+                                                </button>
+                                                
+                                            </td>
                                         }
                                         <td>
                                             <button class="btn btn-danger btn-sm" id="deleteCustomerForAppointment" onclick="DeleteCustomerForAppointment('@item.Id')">

@@ -40,6 +40,8 @@ namespace CWMAssistApp.Controllers
                     x.AppointmentDate < now)
                 .ToList();
 
+            vm.TotalActivePacketCount = _context.CustomerPackets.Count(x => x.CompanyId == user.CompanyId && x.Status);
+
             vm.TotalVisitorCount = totalVisitorsInMonth.Count();
             vm.TotalUniqueVisitorCount = totalVisitorsInMonth.GroupBy(x => x.CustomerId).Count();
             vm.TimelineStartText = now.ToString("dd") + " " + vm.MonthName;
@@ -1339,6 +1341,39 @@ namespace CWMAssistApp.Controllers
             result.DailyVisitorCount = dailyVisitorCount;
             result.DailyTotalIncome = dailyTotalIncome;
             return result;
+        }
+
+        public JsonResult GetActiveCustomerPacket()
+        {
+            var response = new ActiveCustomerPacketVM();
+
+            var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
+
+            var activeCustomerPackets = _context.CustomerPackets.Where(x => x.CompanyId == user.CompanyId && x.Status);
+            if (activeCustomerPackets.Any())
+            {
+                response.ActiveCustomerPackets = new List<ActiveCustomerPacket>();
+                foreach (var item in activeCustomerPackets)
+                {
+                    
+                    var customer = _context.Customers.SingleOrDefault(x => x.Id == item.CustomerId);
+                    var packetUsedCount = _context.CustomerAppointments.Count(x =>
+                        x.CustomerId == item.CustomerId && x.PacketId == item.Id && x.Status);
+
+                    var activeCustomerPacket = new ActiveCustomerPacket()
+                    {
+                        CustomerPacketName = item.PacketName,
+                        CustomerName = customer.Name + " " + customer.Surname,
+                        PacketUsedCount = packetUsedCount + "/" + item.PacketSize,
+                        RemainingCount = item.PacketSize - packetUsedCount
+                    };
+
+                    response.ActiveCustomerPackets.Add(activeCustomerPacket);
+                }
+                
+            }
+
+            return Json(response.ActiveCustomerPackets.OrderBy(x=>x.RemainingCount));
         }
     }
 }
