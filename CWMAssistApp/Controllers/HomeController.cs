@@ -1373,7 +1373,7 @@ namespace CWMAssistApp.Controllers
                 
             }
 
-            return Json(response.ActiveCustomerPackets.OrderBy(x=>x.RemainingCount));
+            return Json(response.ActiveCustomerPackets?.OrderBy(x=>x.RemainingCount));
         }
     }
 }

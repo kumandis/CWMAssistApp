@@ -9,5 +9,6 @@
         public string ServiceUserName { get; set; }
         public string ServicePassword { get; set; }
         public int PacketSize { get; set; }
+        public bool SendSmsEnable { get; set; }
     }
 }

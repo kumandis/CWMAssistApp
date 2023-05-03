@@ -1,4 +1,4 @@
-﻿
+﻿@model SettingVM
 @{
     ViewData["Title"] = "Index";
 }
@@ -27,7 +27,7 @@
                 <div class="card">
                     <div class="card-header p-2">
                         <ul class="nav nav-pills">
-                            <li class="nav-item"><a class="nav-link active" href="#smsSettings" data-toggle="tab">SMS Ayarları</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="#smsSettings" data-toggle="tab">Ayarlar</a></li>
                             <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
                             <li class="nav-item"><a class="nav-link" href="#bulkSms" data-toggle="tab">Toplu SMS</a></li>
                         </ul>
@@ -35,8 +35,32 @@
 
                     <div class="card-body">
                         <div class="tab-content">
-                            <div class="active tab-pane" id="smsSettings">
-                                1
+                            <div class="active tab-pane" id="settings">
+                                <div class="card card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Genel Ayarlar</h3>
+                                    </div>
+                                    <!-- /.card-header -->
+                                    
+                                    <form id="sendBulkSms" asp-controller="Setting" asp-action="Index" method="post">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <!-- textarea -->
+                                                    <div class="form-group">
+                                                        
+                                                        <label for="checkWeek">Randevu Kaydı Sonrası SMS Gönderimi</label>
+                                                        @Html.CheckBoxFor(m=>m.SendSmsServiceEnable)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                                        </div>
+                                    </form>
+                                    
+                                </div>
                             </div>
                             <div class="tab-pane" id="timeline">
                                 2

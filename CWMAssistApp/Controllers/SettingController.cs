@@ -18,7 +18,34 @@ namespace CWMAssistApp.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var model = new SettingVM();
+
+            var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
+
+            var customerSmsPacket = _context.UserSmsPackets.SingleOrDefault(x => x.CompanyId == user.CompanyId && x.Status);
+            if (customerSmsPacket != null)
+            {
+                model.SendSmsServiceEnable = customerSmsPacket.SendSmsEnable;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Index(SettingVM model)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
+
+            var customerSmsPacket = _context.UserSmsPackets.SingleOrDefault(x => x.CompanyId == user.CompanyId && x.Status);
+
+            if (customerSmsPacket != null)
+            {
+                customerSmsPacket.SendSmsEnable = model.SendSmsServiceEnable;
+                _context.Update(customerSmsPacket);
+                _context.SaveChanges();
+            }
+
+            return View(model);
         }
 
         [HttpPost]

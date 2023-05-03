@@ -42,7 +42,7 @@ namespace CWMAssistApp.Controllers
                     noList += "<no>"+SmsHelper.ConvertPhoneNumberToSmsType(item) +"</no>";
                 }
 
-                if (userSmsPacket != null && userSmsPacket.Status && customerList != null)
+                if (userSmsPacket != null && userSmsPacket is { Status: true, SendSmsEnable: true } && customerList != null)
                 {
                     string ss = "";
                     ss += "<?xml version='1.0' encoding='UTF-8'?>";
@@ -80,7 +80,7 @@ namespace CWMAssistApp.Controllers
             {
                 var userSmsPacket = _context.UserSmsPackets.SingleOrDefault(x => x.CompanyId == companyId && x.Status);
 
-                if (userSmsPacket != null && userSmsPacket.Status)
+                if (userSmsPacket != null && userSmsPacket is { Status: true, SendSmsEnable: true })
                 {
                     var cdata = "<mp><msg><![CDATA[" + msg + "]]></msg><no>" + receiverPhoneNumber + "</no></mp>";
 
