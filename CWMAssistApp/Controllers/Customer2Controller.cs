@@ -285,7 +285,7 @@ namespace CWMAssistApp.Controllers
             decimal plannedTotalPrice = 0;
             var totalAppointmentCount = 0;
             var totalCancelledAppointmentCount = 0;
-            model.CustomerAppointmentHistory = new List<CustomerAppointmentHistory>();
+            var _customerAppointmentHistory = new List<CustomerAppointmentHistory>();
 
             var customerAppointments = _context.CustomerAppointments.Where(x => x.CustomerId == customerId && x.Status).OrderByDescending(x=>x.AppointmentDate);
             totalCancelledAppointmentCount =
@@ -331,7 +331,7 @@ namespace CWMAssistApp.Controllers
                             }
                         }
                     }
-                    model.CustomerAppointmentHistory.Add(new CustomerAppointmentHistory()
+                    _customerAppointmentHistory.Add(new CustomerAppointmentHistory()
                     {
                         Id = _appointment.Id,
                         AppointmentDate = _appointment.StartDate,
@@ -342,6 +342,8 @@ namespace CWMAssistApp.Controllers
                 }
             }
 
+            model.CustomerAppointmentHistory = new List<CustomerAppointmentHistory>();
+            model.CustomerAppointmentHistory = _customerAppointmentHistory.OrderByDescending(x => x.AppointmentDate).ToList();
             model.PlannedIncome = plannedTotalPrice;
             model.ComplatedIncome = complatedTotalPrice;
             model.TotalAppointmentCount = totalAppointmentCount;
@@ -434,6 +436,45 @@ namespace CWMAssistApp.Controllers
             response.LastOneMonthVisiter = _lastOneMonthVisiter;
             response.WeekVisiter = _weekVisiter;
             return response;
+        }
+
+        public JsonResult GetCustomerPacketHistory(Guid customerId)
+        {
+            var model = new CustomerPacketHistoryVM();
+            model.CustomerPackets = new List<CustomerPacketHistory>();
+
+            var customerPackets = _context.CustomerPackets.Where(x => x.CustomerId == customerId).ToList();
+            
+
+            foreach (var item in customerPackets)
+            {
+                var customerPacket = new CustomerPacketHistory()
+                {
+                    Status = item.Status,
+                    PacketId = item.Id,
+                    PacketName = item.PacketName,
+                    Appointments = new List<AppointmentHistory>()
+                };
+
+                var appointments = from capp in _context.CustomerAppointments
+                    join app in _context.Appointments on capp.AppointmentId equals app.Id
+                    where capp.PacketId == item.Id && capp.Status == true
+                    orderby app.StartDate
+                    select new { app.Subject, app.StartDate };
+
+                foreach (var app in appointments)
+                {
+                    customerPacket.Appointments.Add(new AppointmentHistory()
+                    {
+                        AppointmentSubject = app.Subject,
+                        AppointmentDate = app.StartDate.ToString("dd.MM.yyyy HH:mm")
+                    });
+                }
+
+                model.CustomerPackets.Add(customerPacket);
+            }
+
+            return Json(model);
         }
     }
 }

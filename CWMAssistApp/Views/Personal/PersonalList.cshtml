@@ -1,4 +1,6 @@
-﻿@model PersonalVM
+﻿@using System.ComponentModel
+@using CWMAssistApp.Data.Entity
+@model PersonalVM
 @{
     ViewData["Title"] = "PersonalList";
 }
@@ -60,6 +62,7 @@
                             <thead>
                             <tr>
                                 <th>Personel Adı</th>
+                                <th>Çalışma Tipi</th>
                                 <th>Uzmanlık</th>
                                 <th>Ders Ücreti</th>
                                 <th>Telefon Numarası</th>
@@ -71,8 +74,9 @@
                             {
                                 @foreach (var item in @Model.PersonalList)
                                 {
-                                    <tr> @*onclick="GetPersonalDetail('@item.Id');">
-*@                                        <td>@item.Name</td>
+                                    <tr> @*onclick="GetPersonalDetail('@item.Id');">*@                                       
+                                        <td>@item.Name</td>
+                                        <td>@item.WorkingType</td>
                                         <td>@item.Profession</td>
                                         <td>@item.SeansPrice ₺</td>
                                         <td>@item.PhoneNumber</td>
@@ -98,7 +102,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Personel Ekleme/Güncelleme</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Personel Ekleme</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

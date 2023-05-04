@@ -142,39 +142,73 @@
             <!-- /.modal-dialog -->
         </div>
         
-        <div class="modal fade" id="modal-all-appointments">
+    <div class="modal fade" id="modal-all-appointments">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Müşterinin Tüm Randevuları</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Hizmet</th>
+                                <th>Konu</th>
+                                <th>Ödeme Tipi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in @Model.CustomerAppointmentHistory)
+                            {
+                                <tr>
+                                        
+                                    <td>@item.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.AppointmentTitle</td>
+                                    <td>@item.PaymentType</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="modal fade" id="modal-packet-history">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Müşterinin Tüm Randevuları</h4>
+                        <h4 class="modal-title">Müşterinin Paket Kayıtları</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="modal-body">
-                            <table id="example1" class="table table-bordered table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Tarih</th>
-                                    <th>Hizmet</th>
-                                    <th>Konu</th>
-                                    <th>Ödeme Tipi</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in @Model.CustomerAppointmentHistory)
-                                {
-                                    <tr>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Paket Geçmişi</h3>
+                                </div>
+                                
+                                <div class="card-body p-0">
+                                    <table id="tblPacketHistory" class="table table-hover">
+                                        <tbody>
                                         
-                                        <td>@item.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.AppointmentTitle</td>
-                                        <td>@item.PaymentType</td>
-                                    </tr>
-                                }
-                                </tbody>
-                            </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">
@@ -184,7 +218,7 @@
             </div>
         </div>
 
-        <div class="row">
+    <div class="row">
             <div class="col-md-8">
                 <div class="card card-primary card-outline">
                     <div class="card-header">
@@ -270,7 +304,7 @@
                                 <div class="col-sm-6">
                                     <ol class="float-sm-right">
                                         <i class="fas fa-clock">
-                                            <a href="#">Geçmiş</a>
+                                        <a href="javascript:getCustomerPacketHistory()">Geçmiş</a>
                                         </i>
                                     </ol>
                                 </div>
@@ -357,6 +391,78 @@
     <script src="~/lib/plugins/toastr/toastr.min.js"></script>
 
     <script>
+
+        function getCustomerPacketHistory() {
+            var customerId = $('#customerId').val();
+            var data = { CustomerId: customerId }
+            $('#modal-packet-history').modal('show');
+            $.ajax({
+                url: '/Customer2/GetCustomerPacketHistory',
+                data: data,
+                success: function (response) {
+                    setPacketHistoryTable(response.customerPackets);
+                    //if (response === "200") {
+                    //    $('#modal-packet').modal('hide');
+                    //    alertify.success('Paket tanımlaması yapıldı');
+                    //    window.location.href = "/customer2/Detail/" + customerId
+                    //} else {
+                    //    $('#modal-packet').modal('hide');
+                    //    alertify.warning('Paket tanımlamada hata oluştu');
+                    //}
+                },
+                error: function () {
+                    //$('#modal-packet').modal('hide');
+                    alertify.error('Erişim sağlanamadı.');
+                }
+            });
+        }
+
+        function setPacketHistoryTable(packetHistory) {
+            var tbl = $("#tblPacketHistory").find('tbody');
+            tbl.empty();
+            for (var i = 0; i < packetHistory.length; i++) {
+
+                var color = packetHistory[i].status == true ? "#54ab54" : "#f6090c";
+                
+                var rowHtml = "";
+
+
+                for (var j = 0; j < packetHistory[i].appointments.length; j++) {
+                    rowHtml += '<tr>' +
+                        '<td>' +
+                        (j + 1) +
+                        ' - ' +
+                        packetHistory[i].appointments[j].appointmentSubject +
+                        ' (' +
+                        packetHistory[i].appointments[j].appointmentDate +
+                        ')' +
+                        '</td>' +
+                        '</tr>';
+                }
+
+                tbl.append('<tr data-widget="expandable-table" aria-expanded="false" style="background-color: ' + color + '">' +
+                                '<td>'+ 
+                                    '<i class="expandable-table-caret fas fa-caret-right fa-fw"></i>' + 
+                                        packetHistory[i].packetName + 
+                                '</td>' +
+                            '</tr>'+
+                            '<tr class="expandable-body">' +
+                                '<td>' +
+                                    '<div class="p-0">' +
+                                        '<table class="table table-hover">' +
+                                            '<tbody>' +
+                                            rowHtml +
+                                            '</tbody>' +
+                                        '</table>' +
+                                    '</div>' +
+                                '</td>' +
+                            '</tr>');
+                
+            }
+        }
+
+        
+
         $(function () {
 
             $('#btnSaveCustomerPacket').click(function () {
@@ -399,8 +505,10 @@
                 "buttons": ["excel", "pdf", "print"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
-    </script>
     
+    
+    </script>
+
     @if (TempData["notification"] != null)
     {
         <script>
