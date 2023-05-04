@@ -285,7 +285,7 @@ namespace CWMAssistApp.Controllers
             decimal plannedTotalPrice = 0;
             var totalAppointmentCount = 0;
             var totalCancelledAppointmentCount = 0;
-            var _customerAppointmentHistory = new List<CustomerAppointmentHistory>();
+            model.CustomerAppointmentHistory = new List<CustomerAppointmentHistory>();
 
             var customerAppointments = _context.CustomerAppointments.Where(x => x.CustomerId == customerId && x.Status).OrderByDescending(x=>x.AppointmentDate);
             totalCancelledAppointmentCount =
@@ -331,7 +331,7 @@ namespace CWMAssistApp.Controllers
                             }
                         }
                     }
-                    _customerAppointmentHistory.Add(new CustomerAppointmentHistory()
+                    model.CustomerAppointmentHistory.Add(new CustomerAppointmentHistory()
                     {
                         Id = _appointment.Id,
                         AppointmentDate = _appointment.StartDate,
@@ -342,8 +342,6 @@ namespace CWMAssistApp.Controllers
                 }
             }
 
-            model.CustomerAppointmentHistory = new List<CustomerAppointmentHistory>();
-            model.CustomerAppointmentHistory = _customerAppointmentHistory.OrderByDescending(x => x.AppointmentDate).ToList();
             model.PlannedIncome = plannedTotalPrice;
             model.ComplatedIncome = complatedTotalPrice;
             model.TotalAppointmentCount = totalAppointmentCount;
