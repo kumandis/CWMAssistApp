@@ -20,5 +20,6 @@ namespace CWMAssistApp.Data
         public DbSet<SmsPacket> SmsPackets { get; set; }
         public DbSet<UserSmsPacket> UserSmsPackets { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<AlarmEntity> Alarms { get; set; }
     }
 }
